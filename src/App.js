@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 
 const Seats4U = () => {
-  const [arg1, setArg1] = useState('');
-  const [arg2, setArg2] = useState('');
+  const [search, setSearch] = useState('');
   const [result, setResult] = useState('');
 
   const handleClick = async () => {
     const payload = {
-      arg1: arg1,
-      arg2: arg2,
+      search: search,
     };
 
     try {
@@ -27,26 +25,21 @@ const Seats4U = () => {
   return (
     <div>
       <center>
+        <h1></h1>
         <button>CREATE VENUE</button><button>LOG IN</button>
-        <h1>Seats4UU</h1>
+        <h1>Seats4U</h1>
+        &nbsp; 🔎 &nbsp;
+        <input
+        id="searchbar"
+        placeholder='Search Shows'
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        />
+        <input type="button" value="SEARCH" onClick={handleClick} />
+        <p> You searched: {result} </p>
+        <br />
       </center>
-      Arg1: &nbsp;
-      <input
-        id="arg1"
-        value={arg1}
-        onChange={(e) => setArg1(e.target.value)}
-      />
-      &nbsp; Arg2: &nbsp;
-      <input
-        id="arg2"
-        value={arg2}
-        onChange={(e) => setArg2(e.target.value)}
-      />
-      <br />
-      Result: &nbsp;
-      <input id="result" value={result} readOnly />
-      <br />
-      <input type="button" value="Add" onClick={handleClick} />
+      
     </div>
   );
 };
