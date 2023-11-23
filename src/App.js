@@ -22,7 +22,15 @@ const Seats4U = () => {
 
   return (
     <>
+    <div>
+        <center>
+            <h1></h1>
+            <a href= "/Home"><button>HOME</button></a>
+            <a href= "/CreateVenue"><button>CREATE VENUE</button></a>
+            <a href= "/Login"><button>LOG IN</button></a>
+        </center>
         {component}
+    </div>
     </>
   );
 };

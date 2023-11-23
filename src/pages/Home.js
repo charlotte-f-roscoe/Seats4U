@@ -27,8 +27,6 @@ const Home = () => {
     <div>
       <center>
         <h1></h1>
-        <a href= "/CreateVenue"><button>CREATE VENUE</button></a>
-        <a href= "/Login"><button>LOG IN</button></a>
         <h1>Seats4U</h1>
         &nbsp; 🔎 &nbsp;
         <input
