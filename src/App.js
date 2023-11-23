@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Home from "./pages/Home.js";
 import Login from "./pages/Login.js";
 import CreateVenue from "./pages/CreateVenue.js";
+import ErrorNotFound from "./pages/ErrorNotFound.js";
 
 const Seats4U = () => {
   let component
@@ -18,6 +19,9 @@ const Seats4U = () => {
     case "/CreateVenue":
         component = <CreateVenue />
         break
+    default:
+        component = <ErrorNotFound />
+
   }
 
   return (
