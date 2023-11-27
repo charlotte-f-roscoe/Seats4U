@@ -17,6 +17,7 @@ const Home = () => {
       });
 
       const resultData = await response.json();
+      console.log(resultData);
       setResult(resultData.body);
     } catch (error) {
       console.error('Error fetching data:', error);
