@@ -31,8 +31,12 @@ const Home = () => {
 
       const resultData = await response.json();
       console.log(resultData);
-      const showInfo = resultData.shows[0];
-      const printInfo = showInfo.showName + "\t" + showInfo.showDate.substring(0,10) + "\t" + convertMilitaryTimeToReadable(showInfo.startTime);
+      let printInfo = "";
+      for (const show of resultData.shows) {
+        console.log(show);
+        printInfo += show.showName + "\t" + show.showDate.substring(0,10) + " at " + convertMilitaryTimeToReadable(show.startTime) + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
+    }
+      
       setResult(printInfo);
     } catch (error) {
       console.error('Error fetching data:', error);
