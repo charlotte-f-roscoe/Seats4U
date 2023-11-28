@@ -1,3 +1,4 @@
+
 const mysql = require('mysql');
 const db_access = require('/opt/nodejs/db_access')
 
@@ -11,39 +12,24 @@ exports.handler = async (event) => {
       database: db_access.config.database
   });
   
-  let ComputeArgumentValue = (value) => {
-          return new Promise((resolve, reject) => {
-              pool.query("SELECT showName FROM Shows WHERE showName=?", [value], (error, rows) => {
-                  if (error) { return reject(error); }
-                  if ((rows) && (rows.length == 1)) {
-                      return resolve(rows[0].value);
-                  } else {
-                      return reject("unable to locate constant '" + value + "'");
-                  }
-              });
-          });
+  let ListConstants = (value) => {
+      return new Promise((resolve, reject) => {
+           pool.query("SELECT * FROM Shows WHERE showName=?", [value], (error, rows) => {
+              if (error) { return reject(error); }
+              return resolve(rows);
+          })
+      })
   }
   
-  // what will be returned.
-  let response = undefined
+  const all_constants = await ListConstants(event.search)
   
-  try {
-    const arg1_value = await ComputeArgumentValue(event.arg1)
-   
-    result = arg1_value
-    
-    response = {
-      statusCode: 200,
-      body: JSON.stringify(result)
-    }
-  } catch (err) {
-    response = {
-      statusCode: 400,
-      error: err
-    }
-  } finally {
-    pool.end()     // disconnect from database to avoid "too many connections" problem that can occur
+  const response = {
+    statusCode: 200,
+    shows: all_constants
   }
   
+  pool.end()     // close DB connections
+
   return response;
 }
+
