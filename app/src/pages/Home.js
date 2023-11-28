@@ -11,7 +11,7 @@ const Home = () => {
     };
 
     try {
-      const response = await fetch('https://oae03j8g04.execute-api.us-east-1.amazonaws.com/Initial/calc', {
+      const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/search', {
         method: 'POST',
         body: JSON.stringify(payload),
       });
