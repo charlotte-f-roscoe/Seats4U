@@ -56,7 +56,29 @@ const Home = () => {
         onChange={(e) => setSearch(e.target.value)}
         />
         <input type="button" value="SEARCH" onClick={handleClick} />
-        <p>{result} </p>
+        
+        {result && (
+        <div style={{ maxWidth: '500px', margin: '0 auto', marginBottom: '5px', marginTop: '25px' }}>
+          <table style={{ width: '100%', textAlign: 'center' }}>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Date/Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {result.split('\n').map((row, index) => (
+                <tr key={index}>
+                  {row.split('\t').map((cell, cellIndex) => (
+                    <td key={cellIndex}>{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
         <br />
       </center>
       
