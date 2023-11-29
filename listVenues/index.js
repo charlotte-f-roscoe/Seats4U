@@ -1,5 +1,8 @@
+
 const mysql = require('mysql');
-const db_access = require('/opt/nodejs/db_access');
+const db_access = require('/opt/nodejs/db_access')
+
+
 
 exports.handler = async (event) => {
   
@@ -11,58 +14,60 @@ exports.handler = async (event) => {
       database: db_access.config.database
   });
   
-  let ComputerArgumentValue = (value) => {
-    return new Promise((resolve, reject) => {
-      pool.query("SELECT showName FROM Shows WHERE venueName=?", [value], (error, rows) => {
-        if (error) { return reject(error); }
-        if ((rows) && (rows.length == 1)) {
-            return resolve(rows[0].value);
-        } else {
-            return reject("unable to locate constant '" + value + "'");
-        }
-      });
-    });
-  };
-  
-  let response = undefined;
-  
-  try {
-    const venueName = ComputerArgumentValue(event.arg1);
-    const layout = ComputerArgumentValue(event.arg2);
-    const venueAuthentication = 0; //generate random sequence of 8?
-    
-    let result = {
-      "venueName": venueName,
-      "shows": [],
-      "layout": layout,
-      "venueAuthentication": venueAuthentication
-    };
-    
-    response = {
-      statusCode: 200,
-      body: JSON.stringify(result)
-    };
-  } catch (err) {
-    response = {
-      statusCode: 400,
-      error: err
-    };
-  } finally {
-    pool.end();
+  let ListConstants = () => {
+      return new Promise((resolve, reject) => {
+           pool.query("SELECT * FROM Venues", (error, rows) => {
+              if (error) { return reject(error); }
+             
+              return resolve(rows);
+          })
+      })
   }
   
-//   { “venueName” : “venue name”,
-// “shows” : [ ],
-// “layout” : {
-// “center” : [6, 3],
-// “left” : [0, 0],
-// “right” : [0, 0] },
-// “venue authentication” : sequence of numbers }
+  let checkAdmin = (value) => {
+      return new Promise((resolve, reject) => {
+           pool.query("SELECT * FROM Administrators where authentication = ?",[value], (error, rows) => {
+              if (error) { return reject(error); }
+              return resolve(rows.length);
+          })
+      })
+  }
+  
+ 
+  
+  let shows;
+  
+  const auth = await checkAdmin(event.authentication);
+  
+  let response;
+  
+ if(auth > 0){
+   shows = await ListConstants();
+   response = {
+    statusCode: 200,
+    shows: shows
+  }
+ }else{
+   response = {
+      statusCode: 400,
+      error: "User not authorized administrator "
+    };
+ }
+  
+   
+  
+  pool.end()     // close DB connections
 
-  // TODO implement
-  // const response = {
-  //   statusCode: 200,
-  //   body: JSON.stringify('Hello from Lambda!'),
-  // };
   return response;
-};
+}
+
+
+
+
+
+
+
+
+
+
+
