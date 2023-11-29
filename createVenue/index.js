@@ -103,7 +103,7 @@ exports.handler = async (event) => {
         "venueName": event.venueName,
         "shows": [],
         "layout": event.layout,
-        "venueAuthentication": venueManager
+        "venueManager": venueManager
       };
       response = {
         statusCode: 200,
