@@ -5,6 +5,7 @@ import CreateVenue from "./pages/CreateVenue.js";
 import ErrorNotFound from "./pages/ErrorNotFound.js";
 import CreateShow from './pages/CreateShow.js';
 import ListVenues from './pages/ListVenues.js';
+import DeleteVenue from './pages/DeleteVenue.js';
 
 
 const Seats4U = () => {
@@ -28,6 +29,9 @@ const Seats4U = () => {
     case "/ListVenues":    
         component = <ListVenues />
         break
+    case "/DeleteVenue":
+        component = <DeleteVenue />
+        break
     default:
         component = <ErrorNotFound />
 
@@ -43,6 +47,7 @@ const Seats4U = () => {
             <a href= "/CreateVenue"><button>CREATE VENUE</button></a>
             <a href= "/ListVenues"><button>LIST VENUES</button></a>
             <a href= "/Login"><button>LOG IN</button></a>
+            <a href= "/DeleteVenue"><button>DELETE VENUE</button></a>
         </center>
         {component}
     </div>
