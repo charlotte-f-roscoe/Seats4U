@@ -1,5 +1,6 @@
 {
   "name": "seats4u",
+  "homepage": ".",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
