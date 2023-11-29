@@ -76,10 +76,11 @@ export default function CreateVenue(){
             // redirect to the home page after successful save
             window.location.href = '/Home';
           } else {
-            alert('Error saving show. Please try again.');
+            alert('Error saving venue. Please try again.');
           }
         
         } catch (error) {
+            alert('Error saving venue. Please try again.\n' + error);
         console.error('Error fetching data:', error);
         }
         
