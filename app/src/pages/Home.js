@@ -1,17 +1,4 @@
 import React, { useState } from 'react';
-function convertMilitaryTimeToReadable(militaryTime) {
-  // Parse the military time string
-  const [hours, minutes] = militaryTime.split(':');
-  
-  // Convert hours to 12-hour format and determine AM/PM
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  const hours12 = hours % 12 || 12; // Handle midnight (00:00) as 12 AM
-
-  // Create the readable time string
-  const readableTime = `${hours12}:${minutes} ${ampm}`;
-
-  return readableTime;
-}
 
 const Home = () => {
 
@@ -34,7 +21,7 @@ const Home = () => {
       let printInfo = "";
       for (const show of resultData.shows) {
         console.log(show);
-        printInfo += show.showName + "\t" + show.showDate.substring(0,10) + " at " + convertMilitaryTimeToReadable(show.startTime) + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
+        printInfo += show.showName + "\t" + show.showDate.substring(0,10) + " at " + show.startTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
     }
       
       setResult(printInfo);
