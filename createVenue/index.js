@@ -1,68 +1,123 @@
 const mysql = require('mysql');
 const db_access = require('/opt/nodejs/db_access');
+const util = require('util');
+//const math = require('math.js');
 
 exports.handler = async (event) => {
-  
   // get credentials from the db_access layer (loaded separately via AWS console)
   var pool = mysql.createPool({
-      host: db_access.config.host,
-      user: db_access.config.user,
-      password: db_access.config.password,
-      database: db_access.config.database
+    host: db_access.config.host,
+    user: db_access.config.user,
+    password: db_access.config.password,
+    database: db_access.config.database
   });
-  
-  let ComputerArgumentValue = (value) => {
+
+  let CheckVenueExists = (value) => {
     return new Promise((resolve, reject) => {
-      pool.query("SELECT showName FROM Shows WHERE venueName=?", [value], (error, rows) => {
+      pool.query("SELECT venueName FROM Venues WHERE venueName=?", [value], (error, rows) => {
         if (error) { return reject(error); }
         if ((rows) && (rows.length == 1)) {
-            return resolve(rows[0].value);
-        } else {
-            return reject("unable to locate constant '" + value + "'");
+          return resolve(true);
+        }
+        else {
+          return resolve(false);
+        }
+      });
+    });
+  };
+
+  let IsLayoutValid = (value) => {
+    return new Promise((resolve, reject) => {
+      if((value.center[0] == 0 && value.center[1] != 0) || (value.center[0] != 0 && value.center[1] == 0)) {
+        return reject("Layout center is invalid");
+      }
+      if((value.left[0] == 0 && value.left[1] != 0) || (value.left[0] != 0 && value.left[1] == 0)) {
+        return reject("Layout left is invalid");
+      }
+      if((value.right[0] == 0 && value.right[1] != 0) || (value.right[0] != 0 && value.right[1] == 0)) {
+        return reject("Layout right is invalid");
+      }
+      if(value.center[0] + value.center[1] + value.left[0] + value.left[1] + value.right[0] + value.right[1] == 0) {
+        return reject("Layout cannot be empty");
+      }
+      return resolve(true);
+    });
+  };
+
+  let CreateVenue = (value) => {
+    return new Promise((resolve, reject) => {
+      pool.query("INSERT INTO Venues(venueName) VALUES(?)", [value], (error, data) => {
+        if (error) { return reject(error); }
+        if ((data) && (data.affectedRows == 1)) {
+          return resolve(true);
+        }
+        else {
+          return reject("unable to create venue: " + data);
         }
       });
     });
   };
   
-  let response = undefined;
+  let GetVenueManager = (value) => {
+    return new Promise((resolve, reject) => {
+      pool.query("SELECT venueManager FROM Venues WHERE venueName=?", [value], (error, data) => {
+        if (error) { return reject(error); }
+        return resolve(data[0].venueManager);
+      });
+    });
+  };
   
+  let CreateLayout = (venueName,value) => {
+    return new Promise((resolve, reject) => {
+      pool.query("INSERT INTO Layouts(venueName,leftRowNum,leftColNum,centerRowNum,centerColNum,rightRowNum,rightColNum) VALUES(?,?,?,?,?,?,?)", [venueName,value.left[0],value.left[1],value.center[0],value.center[1],value.right[0],value.right[1]], (error, data) => {
+        if (error) { return reject(error); }
+        if ((data) && (data.affectedRows == 1)) {
+          return resolve(true);
+        }
+        else {
+          return reject("unable to create layout: " + data);
+        }
+      });
+    });
+  };
+
+  let response = undefined;
+
   try {
-    const venueName = ComputerArgumentValue(event.arg1);
-    const layout = ComputerArgumentValue(event.arg2);
-    const venueAuthentication = 0; //generate random sequence of 8?
-    
-    let result = {
-      "venueName": venueName,
-      "shows": [],
-      "layout": layout,
-      "venueAuthentication": venueAuthentication
-    };
-    
-    response = {
-      statusCode: 200,
-      body: JSON.stringify(result)
-    };
+    if (await CheckVenueExists(event.venueName)) {
+      response = {
+        statusCode: 400,
+        error: "Venue already exists"
+      };
+    } else if(!await IsLayoutValid(event.layout)) {
+      response = {
+        statusCode: 400,
+        error: "layout is not valid"
+      };
+    } else {
+      await CreateVenue(event.venueName);
+      const venueManager = await GetVenueManager(event.venueName);
+      await CreateLayout(event.venueName,event.layout);
+  
+      let result = {
+        "venueName": event.venueName,
+        "shows": [],
+        "layout": event.layout,
+        "venueManager": venueManager
+      };
+      response = {
+        statusCode: 200,
+        body: result
+      };
+    }
   } catch (err) {
     response = {
       statusCode: 400,
       error: err
     };
-  } finally {
+  }
+  finally {
     pool.end();
   }
-  
-//   { “venueName” : “venue name”,
-// “shows” : [ ],
-// “layout” : {
-// “center” : [6, 3],
-// “left” : [0, 0],
-// “right” : [0, 0] },
-// “venue authentication” : sequence of numbers }
-
-  // TODO implement
-  // const response = {
-  //   statusCode: 200,
-  //   body: JSON.stringify('Hello from Lambda!'),
-  // };
   return response;
 };
