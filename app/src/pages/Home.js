@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7abc00bfd0bd0774094f3c5f5c6af89f65871797
 
 const Home = () => {
 
@@ -22,7 +26,11 @@ const Home = () => {
       for (const show of resultData.shows) {
         console.log(show);
         printInfo += show.showName + "\t" + show.showDate.substring(0,10) + " at " + show.startTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
+<<<<<<< HEAD
     }
+=======
+      }
+>>>>>>> 7abc00bfd0bd0774094f3c5f5c6af89f65871797
       
       setResult(printInfo);
     } catch (error) {

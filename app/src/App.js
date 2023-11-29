@@ -46,8 +46,11 @@ const Seats4U = () => {
             <a href= "/CreateShow"><button>CREATE SHOW</button></a>
             <a href= "/CreateVenue"><button>CREATE VENUE</button></a>
             <a href= "/ListVenues"><button>LIST VENUES</button></a>
+<<<<<<< HEAD
             <a href= "/Login"><button>LOG IN</button></a>
             <a href= "/DeleteVenue"><button>DELETE VENUE</button></a>
+=======
+>>>>>>> 7abc00bfd0bd0774094f3c5f5c6af89f65871797
         </center>
         {component}
     </div>

@@ -63,21 +63,26 @@ export default function CreateVenue(){
                 ]
             }
           };
-        /*
+        console.log(payload.layout)
         try {
-        const response = await fetch('', {
+        const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/createVenue', {
             method: 'POST',
             body: JSON.stringify(payload),
         });
     
         const resultData = await response.json();
-        console.log(resultData);
-
+        if (response.ok) {
+            alert("Your password is: "+ resultData.body.venueManager);
+            // redirect to the home page after successful save
+            window.location.href = '/Home';
+          } else {
+            alert('Error saving show. Please try again.');
+          }
         
         } catch (error) {
         console.error('Error fetching data:', error);
         }
-        */
+        
     }
 
     return (
@@ -95,7 +100,7 @@ export default function CreateVenue(){
                 <div class="row">
                 </div>
                 <a href= "/Home"><input type="button" value="Cancel and Exit Venue" /></a>
-                <a href= "/Home"><input type="button" value="Save and Exit Venue" onClick={saveVenue}/></a>
+                <input type="button" value="Save and Exit Venue" onClick={saveVenue}/>
             </center>
             <style
                 dangerouslySetInnerHTML={{
