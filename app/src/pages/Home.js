@@ -11,6 +11,23 @@ const Home = () => {
       search: search,
     };
 
+    function getNormalTime(showTime){
+      let hours = parseInt(showTime/100);
+      let min = showTime%100;
+
+      if(min < 10){
+        min = "0" + min
+      }
+  
+      if (hours >= 12){
+        hours = hours - 12;
+        return "" + hours + ":" + min + " PM";
+      }
+      else{
+          return "" + hours + ":" + min + " AM";
+      }
+    }
+
     try {
       const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Stage1/search', {
         method: 'POST',
@@ -22,7 +39,8 @@ const Home = () => {
       let printInfo = "";
       for (const show of resultData.shows) {
         console.log(show);
-        printInfo += show.showName + "\t" + show.showDate.substring(0,10) + " at " + show.startTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
+        const showTime = getNormalTime(show.startTime);
+        printInfo += show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
       }
       
       setResult(printInfo);
