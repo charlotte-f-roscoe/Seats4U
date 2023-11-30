@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import { Link } from 'react-router-dom';
 export default function ListVenues(){
 
     //const [venues, setVenues] = useState([]);
@@ -69,7 +69,7 @@ export default function ListVenues(){
         if (resultData.statusCode == '200') {
             alert("Your Show has been created!");
             // redirect to the home page after successful save
-            window.location.href = '/Home';
+            window.location.href = '#/';
           } else {
             alert('Error saving show. Please try again.\n' + resultData.error);
           }
@@ -208,7 +208,7 @@ export default function ListVenues(){
             
             <br></br>
             <center>
-              <a href= "/Home"><input type="button" value="Cancel & Exit" style={{ backgroundColor: 'red', color: 'white', marginRight: '40px'}}/></a>
+            <Link to="/"><input type="button" value="Cancel & Exit" style={{ backgroundColor: 'red', color: 'white', marginRight: '40px'}}/></Link>
               <input type="button" value="Save Inactive Show & Exit Show" style={{marginRight: '40px'}} onClick= {(e) => handleSave(e, false)} />
               <input type="button" value="Activate & Exit Show" onClick= {(e) => handleSave(e, true)}/>
             </center>

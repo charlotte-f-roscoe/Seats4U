@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Routes, Route, Link, HashRouter } from 'react-router-dom';
 import Home from "./pages/Home.js";
 import Login from "./pages/Login.js";
 import CreateVenue from "./pages/CreateVenue.js";
@@ -9,50 +10,31 @@ import DeleteVenue from './pages/DeleteVenue.js';
 
 
 const Seats4U = () => {
-  let component
-  switch (window.location.pathname){
-    case "/":
-        component = <Home />
-        break
-    case "/Home":
-        component = <Home />
-        break
-    case "/Login":
-        component = <Login />
-        break
-    case "/CreateVenue":
-        component = <CreateVenue />
-        break
-    case "/CreateShow":
-        component = <CreateShow />
-        break
-    case "/ListVenues":    
-        component = <ListVenues />
-        break
-    case "/DeleteVenue":
-        component = <DeleteVenue />
-        break
-    default:
-        component = <ErrorNotFound />
-
-  }
-
-  return (
-    <>
-    <div>
-        <center>
-            <h1></h1>
-            <a href= "/Home"><button>HOME</button></a>
-            <a href= "/CreateShow"><button>CREATE SHOW</button></a>
-            <a href= "/CreateVenue"><button>CREATE VENUE</button></a>
-            <a href= "/ListVenues"><button>LIST VENUES</button></a>
-            <a href= "/DeleteVenue"><button>DELETE VENUE</button></a>
-
-        </center>
-        {component}
-    </div>
-    </>
-  );
-};
-
+    return (
+      <>
+        <HashRouter basename='/'>
+          <div>
+            <center>
+            <br></br>
+            <Link to="/"><button>HOME</button></Link>
+            <Link to="/CreateShow"><button>CREATE SHOW</button></Link>
+            <Link to="/CreateVenue"><button>CREATE VENUE</button></Link>
+            <Link to="/DeleteVenue"><button>DELETE VENUES</button></Link>
+            <Link to="/ListVenues"><button>LIST VENUES</button></Link>
+            </center>
+          </div>
+  
+          <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/CreateShow" element={<CreateShow />} />
+          <Route path="/CreateVenue" element={<CreateVenue />} />
+          <Route path="/DeleteVenue" element={<DeleteVenue />} />
+          <Route path="/ListVenues" element={<ListVenues />} />
+          <Route path="/ErrorNotFound" element={<ErrorNotFound />} />
+          <Route path="/Login" element={<Login />} />
+          </Routes>
+        </HashRouter>
+      </>
+    );
+  };
 export default Seats4U;

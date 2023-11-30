@@ -42,7 +42,7 @@ export default function DeleteVenue(){
                   
                   const resultData = await response.json();
                   alert("Deleted Venue "+ venueName + ". Going to Home.");
-                  window.location.href = '/Home';
+                  window.location.href = '#/';
                   
                 } catch (error) {
                   console.error('Error fetching data:', error);
@@ -53,7 +53,7 @@ export default function DeleteVenue(){
      
         function no_exit(){
             alert("NOT deleting venue "+ venueName + ". Going to Home.");
-            window.location.href = '/Home';
+            window.location.href = '#/';
         }
 
 
