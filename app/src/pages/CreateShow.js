@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import { Link } from 'react-router-dom';
 export default function ListVenues(){
 
     //const [venues, setVenues] = useState([]);
@@ -30,8 +30,8 @@ export default function ListVenues(){
           show : {
             showName : showName,
             showDate : date,
-            startTime : startTime,
-            endTime : endTime,
+            startTime : computeTime(startTime),
+            endTime : computeTime(endTime),
             blocks: [ ],
             defaultPrice : defaultPrice,
             active: true,
@@ -45,8 +45,8 @@ export default function ListVenues(){
           show : {
             showName : showName,
             showDate : date,
-            startTime : startTime,
-            endTime : endTime,
+            startTime : computeTime(startTime),
+            endTime : computeTime(endTime),
             blocks: [ ],
             defaultPrice : defaultPrice,
             active: false,
@@ -65,12 +65,13 @@ export default function ListVenues(){
         });
     
         const resultData = await response.json();
-        if (response.ok) {
+        console.log(resultData)
+        if (resultData.statusCode == '200') {
             alert("Your Show has been created!");
             // redirect to the home page after successful save
-            window.location.href = '/Home';
+            window.location.href = '#/';
           } else {
-            alert('Error saving show. Please try again.');
+            alert('Error saving show. Please try again.\n' + resultData.error);
           }
         
         } catch (error) {
@@ -93,13 +94,17 @@ export default function ListVenues(){
             });
       
             const resultData = await response.json();
+            setAuth(resultData.statusCode)
+            if(resultData.statusCode == "200"){
+
+            
             console.log(resultData.layout[0].leftRowNum)
             console.log(resultData.layout[0].leftColNum)
             console.log(resultData.layout[0].centerRowNum)
             console.log(resultData.layout[0].centerColNum)
             console.log(resultData.layout[0].rightRowNum)
             console.log(resultData.layout[0].rightColNum)
-            setAuth(resultData.statusCode)
+            
             setVenueName(resultData.layout[0].venueName)
 
             let Lblock = [];
@@ -125,15 +130,34 @@ export default function ListVenues(){
                   }
                   Rblock.push(<br/>);
               } setRBlock(Rblock)
+            }
             
           } catch (error) {
             console.error('Error fetching data:', error);
           }
           
         };
+
+        function notauth(){
+          console.log(auth);
+          if(auth=="400"){
+            return (<div>
+              <center><h1>You do not have authorization.</h1></center></div>);
+           
+          }
+          return (<div>
+            </div>);
+        
+        }
+
+        function computeTime(time){
+          const hour = parseInt(time.substring(0,2));
+          const min = parseInt(time.substring(3,6));
+          const currentTime = hour*100+min;
+          return currentTime;
+        }
     
-        function ListVenues() {
-          if(auth === 200) {
+        function CreateShow() {       
             return (<div>
             <center>
               <h1>Create Show</h1>
@@ -184,7 +208,7 @@ export default function ListVenues(){
             
             <br></br>
             <center>
-              <a href= "/Home"><input type="button" value="Cancel & Exit" style={{ backgroundColor: 'red', color: 'white', marginRight: '40px'}}/></a>
+            <Link to="/"><input type="button" value="Cancel & Exit" style={{ backgroundColor: 'red', color: 'white', marginRight: '40px'}}/></Link>
               <input type="button" value="Save Inactive Show & Exit Show" style={{marginRight: '40px'}} onClick= {(e) => handleSave(e, false)} />
               <input type="button" value="Activate & Exit Show" onClick= {(e) => handleSave(e, true)}/>
             </center>
@@ -233,14 +257,8 @@ export default function ListVenues(){
                     </div>
                     </center>
                 </div>
-
-
             <br /><br />
-          </div>)
-          } else {
-            return (<div>
-              <center><h1>You do not have authorization.</h1></center></div>)
-          }
+          </div>);
         }
     
 
@@ -256,7 +274,7 @@ export default function ListVenues(){
             onChange={(e) => setPassword(e.target.value)}
             /><br></br>
         <input type="button" value="AUTHENTICATE" onClick={() => handleClick()} style={{ marginLeft: '0', padding: '5px' }} />
-        <ListVenues />
+        {auth=="200" ? CreateShow() : notauth()}
         </center>
       </div>
     )

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Routes, Route, Link, HashRouter } from 'react-router-dom';
 import Home from "./pages/Home.js";
 import Login from "./pages/Login.js";
 import CreateVenue from "./pages/CreateVenue.js";
@@ -9,56 +10,31 @@ import DeleteVenue from './pages/DeleteVenue.js';
 
 
 const Seats4U = () => {
-
-    const [component, setComponent] = useState(<Home />);
-
-    const handleClick = async (event, number) => {
-
-        switch (number){
-
-            case 0:
-                setComponent(<Home />)
-                break
-            case 1:
-                setComponent(<Home />)
-                break
-            case 2:
-                setComponent(<Login />)
-                break
-            case 3:
-                setComponent(<CreateVenue />)
-                break
-            case 4:
-                setComponent(<CreateShow />)
-                break
-            case 5:    
-                setComponent(<ListVenues />)
-                break
-            case 6:
-                setComponent(<DeleteVenue />)
-                break
-            default:
-                setComponent(<Home />)
-        }
-
-  }
-
-  return (
-    <>
-    <div>
-        <center>
-            <h1></h1>
-            <input type="button" value="HOME" onClick={(e) => handleClick(e, 0)} />
-            <input type="button" value="CREATE SHOW" onClick={(e) => handleClick(e, 4)} />
-            <input type="button" value="CREATE VENUE" onClick={(e) => handleClick(e, 3)} />
-            <input type="button" value="LIST VENUES" onClick={(e) => handleClick(e, 5)} />
-            <input type="button" value="DELETE VENUE" onClick={(e) => handleClick(e, 6)} />
-
-        </center>
-        {component}
-    </div>
-    </>
-  );
-};
-
+    return (
+      <>
+        <HashRouter basename='/'>
+          <div>
+            <center>
+            <br></br>
+            <Link to="/"><button>HOME</button></Link>
+            <Link to="/CreateShow"><button>CREATE SHOW</button></Link>
+            <Link to="/CreateVenue"><button>CREATE VENUE</button></Link>
+            <Link to="/DeleteVenue"><button>DELETE VENUES</button></Link>
+            <Link to="/ListVenues"><button>LIST VENUES</button></Link>
+            </center>
+          </div>
+  
+          <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/CreateShow" element={<CreateShow />} />
+          <Route path="/CreateVenue" element={<CreateVenue />} />
+          <Route path="/DeleteVenue" element={<DeleteVenue />} />
+          <Route path="/ListVenues" element={<ListVenues />} />
+          <Route path="/ErrorNotFound" element={<ErrorNotFound />} />
+          <Route path="/Login" element={<Login />} />
+          </Routes>
+        </HashRouter>
+      </>
+    );
+  };
 export default Seats4U;

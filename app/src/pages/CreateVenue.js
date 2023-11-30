@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Routes, Route, Link, HashRouter } from 'react-router-dom';
 
 export default function CreateVenue(){
     const [LRows, setLRows] = useState('');
@@ -74,12 +75,13 @@ export default function CreateVenue(){
         if (response.ok) {
             alert("Your password is: "+ resultData.body.venueManager);
             // redirect to the home page after successful save
-            window.location.href = '/Home';
+            window.location.href = '#/';
           } else {
-            alert('Error saving show. Please try again.');
+            alert('Error saving venue. Please try again.');
           }
         
         } catch (error) {
+            alert('Error saving venue. Please try again.\n' + error);
         console.error('Error fetching data:', error);
         }
         
@@ -99,7 +101,7 @@ export default function CreateVenue(){
                 <br/><br/>
                 <div class="row">
                 </div>
-                <a href= "/Home"><input type="button" value="Cancel and Exit Venue" /></a>
+                <Link to="/"><input type="button" value="Cancel and Exit Venue" /></Link>
                 <input type="button" value="Save and Exit Venue" onClick={saveVenue}/>
             </center>
             <style
