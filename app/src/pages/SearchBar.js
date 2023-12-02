@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, createContext, useContext } from "react";
 
 
-const Home = () => {
+const SearchBar = (props) => {
 
   const [search, setSearch] = useState('');
   const [result, setResult] = useState('');
+  // TO GET USER DO props.user
 
   const handleClick = async () => {
     const payload = {
@@ -14,7 +15,6 @@ const Home = () => {
     function getNormalTime(showTime){
       let hours = parseInt(showTime/100);
       let min = showTime%100;
-
       if(min < 10){
         min = "0" + min
       }
@@ -91,4 +91,4 @@ const Home = () => {
     </div>
   );
 };
-export default Home;
+export default SearchBar;
