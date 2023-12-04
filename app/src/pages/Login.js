@@ -18,8 +18,10 @@ export default function Login(props){
               });
             const resultData = await response.json();
             if(resultData.statusCode==200){
-                props.setUser('venueManager')
-                window.location.href = '#/Home';
+                props.setVMStatus()
+                // NEED TO CHANGE THIS ONCE CHANGE LAMBDA FUNCTION
+                props.changeVMName(password)
+                window.location.href = '#/';
             }
             
            
