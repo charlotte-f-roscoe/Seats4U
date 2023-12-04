@@ -112,21 +112,21 @@ export default function ListVenues(){
           let Rblock = [];
               for (let i = 0; i < parseInt(resultData.layout[0].leftRowNum); i++){
                   for(let n=0; n< parseInt(resultData.layout[0].leftColNum); n++){
-                      Lblock.push("☐");
+                      Lblock.push(<input type="button" value=" " />);
                   }
                   Lblock.push(<br/>);
               } setLBlock(Lblock)
 
               for (let i = 0; i <  parseInt(resultData.layout[0].rightRowNum); i++){
                   for(let n=0; n< parseInt(resultData.layout[0].rightColNum); n++){
-                      Cblock.push("☐");
+                      Cblock.push(<input type="button" value=" " />);
                   }
                   Cblock.push(<br/>);
               }setCBlock(Cblock)
 
               for (let i = 0; i < parseInt(resultData.layout[0].rightRowNum); i++){
                   for(let n=0; n< parseInt(resultData.layout[0].rightColNum); n++){
-                      Rblock.push("☐");
+                      Rblock.push(<input type="button" value=" " />);
                   }
                   Rblock.push(<br/>);
               } setRBlock(Rblock)
