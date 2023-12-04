@@ -140,15 +140,11 @@ export default function CreateShow(props){
           
         };
 
-        function notauth(){
-          console.log(auth);
-          if(auth=="400"){
+        function notauth(){  
             return (<div>
               <center><h1>You do not have authorization.</h1></center></div>);
            
-          }
-          return (<div>
-            </div>);
+         
         
         }
 
@@ -263,7 +259,7 @@ export default function CreateShow(props){
           </div>);
         }
     
-    if(props.user=="venueManager" ||props.user=="venueManager" ){
+    if(props.user==1 ||props.user==2 ){
       return CreateShow();
     }else{
         return notauth();
