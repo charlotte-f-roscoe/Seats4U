@@ -123,6 +123,19 @@ exports.handler = async (event) => {
             });
         });
     };
+    let InsertSeat = (showID,section,row,col) => {
+        return new Promise((resolve, reject) => {
+            pool.query("INSERT INTO Seats(showID,rowNum,colNum,seatSection,available) VALUES(?,?,?,?,?)",[showID,row,col,section,1], (error,rows) => {
+                if (error) { return reject(error); }
+                if ((rows) && (rows.affectedRows == 1)) {
+                  return resolve("seat inserted");
+                }
+                else {
+                  return reject("seat not inserted");
+                }
+            });
+        });
+    };
     
     let response = undefined;
     
@@ -132,19 +145,33 @@ exports.handler = async (event) => {
             await CheckShowOverlap(event.venueName,event.show.showDate,event.show.startTime,event.show.endTime);
             
             const layout = await GetLayout(event.venueName);
-            //const seats = 0;
-            /* !!!
-            blocks need row layout test
-            get layout
-            make empty seats
-            */
             
             await CreateShow(event.venueName,event.show.showName,event.show.showDate,event.show.startTime,event.show.endTime,event.show.defaultPrice,event.show.active,event.show.soldOut);
             
             const blocks = event.show.blocks;
             
             let showID = await GetShowID(event.venueName,event.show.showName,event.show.showDate,event.show.startTime,event.show.endTime);
+            //Create seats
+            //left
+            for(let r=1;r<=layout.leftRowNum;r++) {
+                for(let c=1;c<=layout.leftColNum;c++) {
+                    await InsertSeat(showID,"left",r,c);
+                }
+            }
+            //center
+            for(let r=1;r<=layout.centerRowNum;r++) {
+                for(let c=1;c<=layout.centerColNum;c++) {
+                    await InsertSeat(showID,"center",r,c);
+                }
+            }
+            //right
+            for(let r=1;r<=layout.rightRowNum;r++) {
+                for(let c=1;c<=layout.rightColNum;c++) {
+                    await InsertSeat(showID,"right",r,c);
+                }
+            }
             
+            //Create blocks
             for(let i=0;i<blocks.length;i++) {
                 await isBlockValid(blocks[i],layout);
                 await isBlockOverlap(showID,blocks[i]);
@@ -156,6 +183,7 @@ exports.handler = async (event) => {
                 "date": event.show.showDate,
                 "startTime": event.show.startTime,
                 "endTime": event.show.endTime,
+                "defaultPrice": event.show.defaultPrice,
                 "blocks": event.show.blocks,
                 "active": event.show.active,
                 "soldOut": event.show.soldOut,
