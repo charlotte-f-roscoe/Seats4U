@@ -48,9 +48,12 @@ export default function Seats4U () {
   const changeVMName = (name) =>{
     return setVMName(name)
   }
+
+  const logOut = () =>{
+    window.location.href = '#/';
+    return setConsumerStatus()
+  }
   
-
-
   if(user==0){
         return (
           <div>
@@ -84,7 +87,7 @@ export default function Seats4U () {
           <Link to="/"><button>HOME</button></Link>
           <Link to="/CreateVenue"><button>CREATE VENUE</button></Link>
           <Link to="/CreateShow"><button>CREATE SHOW</button></Link>
-          <button onClick={setConsumerStatus}>LOG OUT</button>
+          <button onClick={logOut}>LOG OUT</button>
           </center>
         </div>
 
