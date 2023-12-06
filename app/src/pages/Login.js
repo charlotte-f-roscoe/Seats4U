@@ -1,28 +1,36 @@
 import React, { useState } from 'react';
-export default function Login(){
+
+export default function Login(props){
 
     const [password, setPassword] = useState('');
     let authorized = false;
 
     const handleClick = async () => {
-        const payload = {
-          authentification: password,
-        };
-        /*
-        try {
-          const response = await fetch('', {
-            method: 'GET',
-            body: JSON.stringify(payload),
-          });
-    
-          const result = await response.json();
-          if (result === 200){
-            authorized == true;
-          }
-        } catch (error) {
-          console.error('Error fetching data:', error);
+        try{
+            const payload = {
+              authentication: password,
+            };
+       
+            /// NEEDS TO BE UPDATED FOR ADMIN
+            const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/checkVenueManager', {
+                method: 'POST',
+                body: JSON.stringify(payload),
+              });
+            const resultData = await response.json();
+            if(resultData.statusCode==200){
+                props.setVMStatus()
+                // NEED TO CHANGE THIS ONCE CHANGE LAMBDA FUNCTION
+                props.changeVMName(password)
+                window.location.href = '#/';
+            }
+            
+           
+        }catch(error){
+            console.error('Error fetching data:', error);
         }
-        */
+        
+
+        
       };
 
     return (

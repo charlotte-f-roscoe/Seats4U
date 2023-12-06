@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-export default function ListVenues(){
+export default function CreateShow(props){
+
+  // TO GET USER - props.user
 
     //const [venues, setVenues] = useState([]);
     const [error, setError] = useState(null);
@@ -138,15 +140,11 @@ export default function ListVenues(){
           
         };
 
-        function notauth(){
-          console.log(auth);
-          if(auth=="400"){
+        function notauth(){  
             return (<div>
               <center><h1>You do not have authorization.</h1></center></div>);
            
-          }
-          return (<div>
-            </div>);
+         
         
         }
 
@@ -261,21 +259,10 @@ export default function ListVenues(){
           </div>);
         }
     
+    if(props.user==1 ||props.user==2 ){
+      return CreateShow();
+    }else{
+        return notauth();
+    }
 
-    return (
-      <div>
-        <center>
-          <br></br>
-          <p>This view requires Venue Manager authorization. Please enter your password below.</p>
-          <input
-            id="password"
-            placeholder='Enter password'
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            /><br></br>
-        <input type="button" value="AUTHENTICATE" onClick={() => handleClick()} style={{ marginLeft: '0', padding: '5px' }} />
-        {auth=="200" ? CreateShow() : notauth()}
-        </center>
-      </div>
-    )
 }
