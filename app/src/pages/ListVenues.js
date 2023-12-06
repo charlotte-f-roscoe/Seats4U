@@ -22,14 +22,20 @@ export default function ListVenues(){
               method: 'POST',
               body: JSON.stringify(payload),
             });
-      
+            
             const resultData = await response.json();
             setAuth(resultData.statusCode)
 
             let printInfo = [];
             for (let i = 0; i<resultData.shows.length; i++){
-              printInfo.push(resultData.shows[i].venueName)
-              printInfo.push(<br/>)
+              //printInfo.push(resultData.shows[i].venueName)
+              printInfo.push(
+              <div key={i} style={{ maxWidth: '500px', margin: '0 auto', marginBottom: '5px' }}>
+              <p style={{ backgroundColor: '#282A35', color: '#fff', padding: '9px', borderRadius: '3px', margin: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>{resultData.shows[i].venueName}</span>
+                <input type="button" value="View Venue" onClick={() => handleClick(resultData.shows[i].id)} style={{ marginLeft: '0', padding: '5px' }} />
+              </p>
+            </div>)
             }
             setResult(printInfo);
             
@@ -71,5 +77,7 @@ export default function ListVenues(){
         <ListVenues />
         </center>
       </div>
+
+      
     )
 }
