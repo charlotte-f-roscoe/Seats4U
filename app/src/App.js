@@ -12,9 +12,9 @@ import DeleteVenue from './pages/DeleteVenue.js';
 
 export default function Seats4U () {
   const [user, setUser] = useState(0);
-  const [vmName, setVMName] = useState('')
+  const [password, setPassword] = useState('')
   console.log(user)
-  console.log(vmName)
+  console.log(password)
 
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export default function Seats4U () {
       if(userStatus==1){
         let managerName = JSON.parse(window.localStorage.getItem('vmName'))
         setVMStatus()
-        setVMName(managerName)
+        setPassword(managerName)
       }else if(userStatus==2){
         setAdminStatus()
       }
@@ -30,8 +30,8 @@ export default function Seats4U () {
 
   useEffect(() => {
     window.localStorage.setItem('user', user);
-    window.localStorage.setItem('vmName', vmName);
-  }, [user, vmName]);
+    window.localStorage.setItem('vmName', password);
+  }, [user, password]);
 
   const setAdminStatus = () =>{
     return setUser(2)
@@ -45,12 +45,13 @@ export default function Seats4U () {
     return setUser(0)
   }
 
-  const changeVMName = (name) =>{
-    return setVMName(name)
+  const changePassword = (name) =>{
+    return setPassword(name)
   }
 
   const logOut = () =>{
     window.location.href = '#/';
+    setPassword('')
     return setConsumerStatus()
   }
   
@@ -70,7 +71,7 @@ export default function Seats4U () {
             <Routes>
             <Route path="/" element={ <SearchBar user={user}/> } />
             <Route path="/CreateVenue" element={<CreateVenue/>} />
-            <Route path="/Login" element = {<Login setVMStatus={setVMStatus} changeVMName={changeVMName}></Login>} />
+            <Route path="/Login" element = {<Login setVMStatus={setVMStatus} changePassword={changePassword} setAdminStatus = {setAdminStatus} ></Login>} />
             </Routes>
           </HashRouter>
         </div>
@@ -110,14 +111,15 @@ export default function Seats4U () {
             <Link to="/CreateVenue"><button>CREATE VENUE</button></Link>
             <Link to="/CreateShow"><button>CREATE SHOW</button></Link>
             <Link to="/ListVenues"><button>LIST VENUES</button></Link>
+            <button onClick={logOut}>LOG OUT</button>
             </center>
           </div>
   
           <Routes>
           <Route path="/" element={ <SearchBar user={user}/> } />
           <Route path="/CreateVenue" element={<CreateVenue/>} />
-          <Route path="/ListVenues" element={<ListVenues />} />
-          <Route path="/CreateVenue" element={<CreateVenue/>} />
+          <Route path="/ListVenues" element={<ListVenues user = {user} password={password}/>} />
+          <Route path="/CreateShow" element={<CreateShow user={user}/>} />
           </Routes>
         </HashRouter>
        

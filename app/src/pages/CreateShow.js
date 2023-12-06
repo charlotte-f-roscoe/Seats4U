@@ -89,13 +89,14 @@ export default function CreateShow(props){
         };
 
         try {
-            const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/checkVenueManager', 
+            const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/logIn', 
             {
               method: 'POST',
               body: JSON.stringify(payload),
             });
       
             const resultData = await response.json();
+            console.log(resultData)
             setAuth(resultData.statusCode)
             if(resultData.statusCode == "200"){
 
@@ -258,7 +259,7 @@ export default function CreateShow(props){
             <br /><br />
           </div>);
         }
-    
+
     if(props.user==1 ||props.user==2 ){
       return CreateShow();
     }else{
