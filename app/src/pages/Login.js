@@ -11,15 +11,22 @@ export default function Login(props){
               authentication: password,
             };
        
-            /// NEEDS TO BE UPDATED FOR ADMIN
-            const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/checkVenueManager', {
+            const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/logIn', {
                 method: 'POST',
                 body: JSON.stringify(payload),
               });
             const resultData = await response.json();
-            if(resultData.statusCode==200){
-                props.setUser('venueManager')
+            console.log(resultData)
+            if(resultData.status=="user is a venue manager"){
+                props.setVMStatus()
+                props.changePassword(password)
                 window.location.href = '#/';
+            }else if(resultData.status=="user is an administrator"){
+                props.setAdminStatus()
+                props.changePassword(password)
+                window.location.href = '#/';
+            }else{
+                alert("Invalid Password");
             }
             
            

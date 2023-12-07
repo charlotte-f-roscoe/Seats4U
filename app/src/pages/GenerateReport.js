@@ -14,10 +14,11 @@ export default function GenerateReport(props){
        
         const payload = {
           venueName: venueName,
-          authentication: parseInt(password),
+          authentication: password,
         };
 
         console.log(payload)
+        
      
         try {
             
@@ -26,7 +27,22 @@ export default function GenerateReport(props){
               method: 'POST',
               body: JSON.stringify(payload),
             });
-      
+
+            function getNormalTime(showTime){
+                let hours = parseInt(showTime/100);
+                let min = showTime%100;
+                if(min < 10){
+                  min = "0" + min
+                }
+            
+                if (hours >= 12){
+                  hours = hours - 12;
+                  return "" + hours + ":" + min + " PM";
+                }
+                else{
+                    return "" + hours + ":" + min + " AM";
+                }
+              }
             const resultData = await response.json();
             console.log(resultData);
             setAuthentication(resultData.statusCode)
@@ -35,12 +51,15 @@ export default function GenerateReport(props){
             let printInfo = [];
             for (let i = 0; i<resultData.body.length; i++){
               //printInfo.push(resultData.shows[i].venueName)
+    
               const show = resultData.body[i];
+              const showTime = getNormalTime(show.startTime);
+             
               printInfo.push(
                 <tr key={i}>
                     <td style={tableCellStyle}>{show.venueName}</td>
                     <td style={tableCellStyle}>{show.showName}</td>
-                    <td style={tableCellStyle}>{show.dateTime}</td>
+                    <td style={tableCellStyle}>{show.showDate.substring(0, 10) + " at " + showTime}</td>
                     <td style={tableCellStyle}>{show.active}</td>
                     <td style={tableCellStyle}>{show.seatsSold}</td>
                     <td style={tableCellStyle}>{show.seatsLeft}</td>
@@ -48,11 +67,13 @@ export default function GenerateReport(props){
                 </tr>
                 
               );
+              
             }
             setResult(printInfo);
         
           } catch (error) {
             console.error('Error fetching data:', error);
+            alert('No Results Found');
           }
         };
         function GenerateReport() {
@@ -119,6 +140,22 @@ export default function GenerateReport(props){
                         onChange={(e) => setPassword(e.target.value)}
                         /><br></br>
                     <input type="button" value="AUTHENTICATE" onClick={() => handleClick()} style={{ marginLeft: '0', padding: '5px' }} />
+                    
+                </center>
+
+
+                <center>
+                    <br></br>
+                    <p>Please enter Venue Name.</p>
+                    <input
+                        id="venueName"
+                        placeholder="Enter Venue"
+                        value={venueName}
+                        onChange={(e) => setVenueName(e.target.value)}
+                        />
+                    <br></br>
+                   
+                    <input type="button" value="ENTER VENUE" onClick={() => handleClick()} style={{ marginLeft: '0', padding: '5px' }} />
                     <GenerateReport />
                 </center>
           </div>

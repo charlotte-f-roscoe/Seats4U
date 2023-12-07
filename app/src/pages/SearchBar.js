@@ -1,11 +1,12 @@
 import React, { useState, createContext, useContext } from "react";
 
 
-const Home = (props) => {
+const SearchBar = (props) => {
 
   const [search, setSearch] = useState('');
   const [result, setResult] = useState('');
   const [active, setActive] = useState('');
+  const [hasResults, setHasResult] = useState(false); // Initialize hasResults state
   // TO GET USER DO props.user
 
   const handleActiveSearch = async () => {
@@ -39,9 +40,9 @@ const Home = (props) => {
           //console.log(show);
           const showTime = getNormalTime(show.startTime);
           //printInfo += show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
-          if (props.user === 'consumer') {
+          if (props.user === 0) {
             printInfo += show.showName + "\t" + (show.showDate?.substring(0, 10) || 'N/A') + " at " + showTime + "\t" + show.venueName + "\t" + "\n";
-          } else if (props.user === 'venueManager' || props.user === 'admin') {
+          } else if (props.user === 1 || props.user === 2) {
             printInfo += show.showName + "\t" + (show.showDate?.substring(0, 10) || 'N/A') + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
           }
         }
@@ -93,33 +94,43 @@ const Home = (props) => {
       console.log(resultData);
       
       let printInfo = "";
+      let hasResults = false; 
       for (const show of resultData.shows) {
       //  for (const show of showsForVenueManager ) {
         //console.log(show);
         const showTime = getNormalTime(show.startTime);
         //printInfo += show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
-        if (props.user === 'consumer' && show.active) {
+        if (props.user === 0 && show.active) {
           printInfo += show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + show.venueName + "\t"  + "\n";
-        } else if (props.user === 'venueManager' || props.user === 'admin') {
+          hasResults = true;
+        } else if (props.user === 1 || props.user === 2) {
           printInfo += show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
+          hasResults = true;
         }
       }
       
-      setResult(printInfo);
+      
+      if (!hasResults && props.user === 0) {
+        // display a message for the consumer when there are no results
+        setResult(`No results for "${search}"`);
+      } else {
+        setResult(printInfo);
+      }
+     // setResult(printInfo);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
 
   const renderStatusOrVenueHeader = () => {
-    if (props.user === 'consumer') {
+    if (props.user === 0) {
       return <th>Venue</th>;
-    } else if (props.user === 'venueManager' || props.user === 'admin') {
+    } else if (props.user === 1 || props.user === 2) {
       return <th>Status</th>;
     }
-    return null; // You can handle other cases if needed
+    return null; 
   };
-
+  
 
   return (
     <div>
@@ -134,33 +145,42 @@ const Home = (props) => {
         onChange={(e) => setSearch(e.target.value)}
         />
         <input type="button" value="SEARCH" onClick={handleClick}/>
-        
+       
         {result && (
-        <div style={{ maxWidth: '500px', margin: '0 auto', marginBottom: '5px', marginTop: '25px' }}>
-          <table style={{ width: '100%', textAlign: 'center' }}>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Date/Time</th>
-                {renderStatusOrVenueHeader()}
-              </tr>
-            </thead>
-            <tbody>
-              {result.split('\n').map((row, index) => (
-                <tr key={index}>
-                  {row.split('\t').map((cell, cellIndex) => (
-                    <td key={cellIndex}>{cell}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+  <div style={{ maxWidth: '500px', margin: '0 auto', marginBottom: '5px', marginTop: '25px' }}>
+    <table style={{ width: '100%', textAlign: 'center' }}>
+      {result !== `No results for "${search}"` && (
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Date/Time</th>
+            {renderStatusOrVenueHeader()}
+          </tr>
+        </thead>
       )}
+      <tbody>
+        {result === `No results for "${search}"` ? (
+          <tr>
+            <td colSpan={3}>{result}</td>
+          </tr>
+        ) : (
+          result.split('\n').map((row, index) => (
+            <tr key={index}>
+              {row.split('\t').map((cell, cellIndex) => (
+                <td key={cellIndex}>{cell}</td>
+              ))}
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+)}
+
         <br />
       </center>
       
     </div>
   );
 };
-export default Home;
+export default SearchBar;
