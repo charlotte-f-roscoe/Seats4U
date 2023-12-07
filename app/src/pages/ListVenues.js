@@ -22,10 +22,16 @@ export default function ListVenues(props){
         console.log(resultData)
 
         let printInfo = [];
-        for (let i = 0; i<resultData.shows.length; i++){
-          printInfo.push(resultData.shows[i].venueName)
-          printInfo.push(<br/>)
-        }
+            for (let i = 0; i<resultData.shows.length; i++){
+              //printInfo.push(resultData.shows[i].venueName)
+              printInfo.push(
+              <div key={i} style={{ maxWidth: '500px', margin: '0 auto', marginBottom: '5px' }}>
+              <p style={{ backgroundColor: '#282A35', color: '#fff', padding: '9px', borderRadius: '3px', margin: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>{resultData.shows[i].venueName}</span>
+                <input type="button" value="View Venue"  style={{ marginLeft: '0', padding: '5px' }} />
+              </p>
+            </div>)
+            }
         setResult(printInfo);
                 
         }catch (error) {

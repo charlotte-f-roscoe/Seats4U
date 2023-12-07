@@ -5,6 +5,7 @@ import Login from "./pages/Login.js";
 import CreateVenue from "./pages/CreateVenue.js";
 import CreateShow from './pages/CreateShow.js';
 import ListVenues from './pages/ListVenues.js';
+import GenerateReport from './pages/GenerateReport.js';
 
 
 
@@ -102,6 +103,7 @@ export default function Seats4U () {
           <Link to="/"><button>HOME</button></Link>
           <Link to="/CreateVenue"><button>CREATE VENUE</button></Link>
           <Link to="/CreateShow"><button>CREATE SHOW</button></Link>
+          <Link to="/GenerateReport"><button>GENERATE REPORT</button></Link>
           <button onClick={logOut}>LOG OUT</button>
           </center>
         </div>
@@ -110,6 +112,7 @@ export default function Seats4U () {
         <Route path="/" element={ <SearchBar user={user} password = {password}/> } />
         <Route path="/CreateVenue" element={<CreateVenue/>} />
         <Route path="/CreateShow" element={<CreateShow user={user} password={password} venueName={venueName}/>} />
+        <Route path="/GenerateReport" element={<GenerateReport user={user} password={password} venueName={venueName}/>} />
         </Routes>
       </HashRouter>
       
@@ -125,6 +128,7 @@ export default function Seats4U () {
             <Link to="/CreateVenue"><button>CREATE VENUE</button></Link>
             <Link to="/CreateShow"><button>CREATE SHOW</button></Link>
             <Link to="/ListVenues"><button>LIST VENUES</button></Link>
+            <Link to="/GenerateReport"><button>GENERATE REPORT</button></Link>
             <button onClick={logOut}>LOG OUT</button>
             </center>
           </div>
@@ -134,6 +138,7 @@ export default function Seats4U () {
           <Route path="/CreateVenue" element={<CreateVenue/>} />
           <Route path="/ListVenues" element={<ListVenues user = {user} password={password}/>} />
           <Route path="/CreateShow" element={<CreateShow user={user} password={password}/>} />
+          <Route path="/GenerateReport" element={<GenerateReport user={user} password={password} venueName = {venueName}/>} />
           </Routes>
         </HashRouter>
        
