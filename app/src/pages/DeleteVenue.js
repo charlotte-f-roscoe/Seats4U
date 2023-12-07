@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function DeleteVenue(){
+export default function DeleteVenue(props){
   
     const [password, setPassword] = useState('');
     const [response, setResponse] = useState('');
@@ -9,7 +9,7 @@ export default function DeleteVenue(){
 
     const handleClick = async () => {
         const payload = {
-          authentication: password,
+          authentication: props.password,
         };
 
         try {
@@ -29,8 +29,8 @@ export default function DeleteVenue(){
 
         const deleteVenue = async () => {
             const payload = {
-                venueManager: password,
-                venueName: venueName
+                venueManager: props.password,
+                venueName: props.venueName
             };
 
               try {
@@ -41,8 +41,18 @@ export default function DeleteVenue(){
                   });
                   
                   const resultData = await response.json();
-                  alert("Deleted Venue "+ venueName + ". Going to Home.");
-                  window.location.href = '#/';
+                  console.log(resultData)
+                  if(resultData.statusCode==200){
+                    alert("Deleted Venue "+ venueName + ". Going to Home.");
+                    window.location.href='#/'
+                    props.logOut()
+                    window.location.href='#/'
+                  }else{
+                    alert("Unable to deleted Venue "+ venueName +"\t" + resultData.error);
+                  }
+                  
+
+                  
                   
                 } catch (error) {
                   console.error('Error fetching data:', error);
@@ -58,7 +68,7 @@ export default function DeleteVenue(){
 
 
         function AreYouSure() {
-          if(response == 200) {
+        
             return (<div>
             <center>
               <h1>Are you sure you want to delete {venueName}?</h1>
@@ -66,29 +76,14 @@ export default function DeleteVenue(){
               <button onClick={() => no_exit()}> No</button>
             </center>
           </div>)
-          }
-          else if(response==400){
-            return (<div>
-                <center><h1>You do not have authorization.</h1></center></div>)
-            }
-         else {
-            return <div></div>
-            }
+         
         }
     
 
     return (
       <div>
         <center>
-          <br></br>
-          <p>This view requires Venue Manager authorization. Please enter your password below.</p>
-          <input
-            id="password"
-            placeholder='Enter password'
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            /><br></br>
-        <input type="button" value="AUTHENTICATE" onClick={() => handleClick()} style={{ marginLeft: '0', padding: '5px' }} />
+        
         <AreYouSure />
         </center>
       </div>

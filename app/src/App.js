@@ -6,6 +6,7 @@ import CreateVenue from "./pages/CreateVenue.js";
 import CreateShow from './pages/CreateShow.js';
 import ListVenues from './pages/ListVenues.js';
 import GenerateReport from './pages/GenerateReport.js';
+import DeleteVenue from './pages/DeleteVenue.js';
 
 
 export default function Seats4U () {
@@ -101,6 +102,7 @@ export default function Seats4U () {
           <Link to="/"><button>HOME</button></Link>
           <Link to="/CreateVenue"><button>CREATE VENUE</button></Link>
           <Link to="/CreateShow"><button>CREATE SHOW</button></Link>
+          <Link to="/DeleteVenue"><button>DELETE VENUE</button></Link>
           <Link to="/GenerateReport"><button>GENERATE REPORT</button></Link>
           <button onClick={logOut}>LOG OUT</button>
           </center>
@@ -110,6 +112,7 @@ export default function Seats4U () {
         <Route path="/" element={ <SearchBar user={user} password = {password}/> } />
         <Route path="/CreateVenue" element={<CreateVenue/>} />
         <Route path="/CreateShow" element={<CreateShow user={user} password={password} venueName={venueName}/>} />
+        <Route path='/DeleteVenue' element={<DeleteVenue password={password} logOut = {logOut} venueName={venueName}/>} />
         <Route path="/GenerateReport" element={<GenerateReport user={user} password={password} venueName={venueName}/>} />
         </Routes>
       </HashRouter>
