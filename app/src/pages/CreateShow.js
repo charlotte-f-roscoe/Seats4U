@@ -2,22 +2,13 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 export default function CreateShow(props){
 
-  // TO GET USER - props.user
-
-    //const [venues, setVenues] = useState([]);
-    const [error, setError] = useState(null);
-    const [result, setResult] = useState('');
-    const [password, setPassword] = useState('');
     const [venueName, setVenueName] = useState('');
     const [showName, setShowName] = useState('');
     const [date, setDate] = useState('');
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
-    //const [blocks, setBlocks] = useState([]);
-    //const [newBlock, setNewBlock] = useState({ price: '', section: '', rows: [] });
-    const [activity, setStatus] = useState('');
+
     const [defaultPrice, setDefaultPrice] = useState('');
-    const [auth, setAuth] = useState('');
 
     const [lBlock, setLBlock] = useState('');
     const [cBlock, setCBlock] = useState('');
@@ -28,7 +19,7 @@ export default function CreateShow(props){
       let payloadSaveShow = {};
       if(status === true){
         payloadSaveShow = {
-          venueName : venueName,
+          venueName : props.venueName,
           show : {
             showName : showName,
             showDate : date,
@@ -39,11 +30,11 @@ export default function CreateShow(props){
             active: true,
             soldOut: false, 
           },
-          authentication: password
+          authentication: props.password
         }
       } else {
         payloadSaveShow = {
-          venueName : venueName,
+          venueName : props.venueName,
           show : {
             showName : showName,
             showDate : date,
@@ -54,7 +45,7 @@ export default function CreateShow(props){
             active: false,
             soldOut: false, 
           },
-          authentication: password
+          authentication: props.password
         }
       } 
 
@@ -85,7 +76,7 @@ export default function CreateShow(props){
 
     const handleClick = async () => {
         const payload = {
-          authentication: password,
+          authentication: props.password,
         };
 
         try {
@@ -97,7 +88,6 @@ export default function CreateShow(props){
       
             const resultData = await response.json();
             console.log(resultData)
-            setAuth(resultData.statusCode)
             if(resultData.statusCode == "200"){
 
             
@@ -144,9 +134,6 @@ export default function CreateShow(props){
         function notauth(){  
             return (<div>
               <center><h1>You do not have authorization.</h1></center></div>);
-           
-         
-        
         }
 
         function computeTime(time){
@@ -160,7 +147,7 @@ export default function CreateShow(props){
             return (<div>
             <center>
               <h1>Create Show</h1>
-              <label>Venue Name: {venueName}</label> 
+              <label>Venue Name: {props.venueName}</label> 
               <br></br><br></br>
               <label>
                 Show Name: 
@@ -204,7 +191,6 @@ export default function CreateShow(props){
                 />
               </label>
             </center>
-            
             <br></br>
             <center>
             <Link to="/"><input type="button" value="Cancel & Exit" style={{ backgroundColor: 'red', color: 'white', marginRight: '40px'}}/></Link>

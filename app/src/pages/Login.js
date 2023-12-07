@@ -20,6 +20,7 @@ export default function Login(props){
             if(resultData.status=="user is a venue manager"){
                 props.setVMStatus()
                 props.changePassword(password)
+                props.setVMName(resultData.venueName)
                 window.location.href = '#/';
             }else if(resultData.status=="user is an administrator"){
                 props.setAdminStatus()

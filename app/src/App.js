@@ -1,37 +1,42 @@
-import React, { createContext, useEffect, useState } from 'react';
-import { Routes, Route, Link, HashRouter, RouterProvider } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Routes, Route, Link, HashRouter } from 'react-router-dom';
 import SearchBar from "./pages/SearchBar.js";
 import Login from "./pages/Login.js";
 import CreateVenue from "./pages/CreateVenue.js";
-import ErrorNotFound from "./pages/ErrorNotFound.js";
 import CreateShow from './pages/CreateShow.js';
 import ListVenues from './pages/ListVenues.js';
-import DeleteVenue from './pages/DeleteVenue.js';
+
 
 
 
 export default function Seats4U () {
   const [user, setUser] = useState(0);
   const [password, setPassword] = useState('')
+  const [venueName, setVenueName] = useState('')
   console.log(user)
   console.log(password)
-
+  console.log(venueName)
 
   useEffect(() => {
       let userStatus = JSON.parse(window.localStorage.getItem('user'))
       if(userStatus==1){
-        let managerName = JSON.parse(window.localStorage.getItem('vmName'))
+        let managerPassword = window.localStorage.getItem('password')
+        let vmName = window.localStorage.getItem('venueName')
         setVMStatus()
-        setPassword(managerName)
+        setPassword(managerPassword)
+        setVenueName(vmName)
       }else if(userStatus==2){
+        let adminPass = window.localStorage.getItem('password')
         setAdminStatus()
+        setPassword(adminPass)
       }
   }, []);
 
   useEffect(() => {
     window.localStorage.setItem('user', user);
-    window.localStorage.setItem('vmName', password);
-  }, [user, password]);
+    window.localStorage.setItem('password', password);
+    window.localStorage.setItem('venueName', venueName);
+  }, [user, password, venueName]);
 
   const setAdminStatus = () =>{
     return setUser(2)
@@ -45,14 +50,21 @@ export default function Seats4U () {
     return setUser(0)
   }
 
+  const setVMName = (vmName) =>{
+    return setVenueName(vmName)
+  }
+
   const changePassword = (name) =>{
     return setPassword(name)
   }
 
+
+
   const logOut = () =>{
+    setConsumerStatus()
+    setVenueName('')
     window.location.href = '#/';
     setPassword('')
-    return setConsumerStatus()
   }
   
   if(user==0){
@@ -71,7 +83,7 @@ export default function Seats4U () {
             <Routes>
             <Route path="/" element={ <SearchBar user={user}/> } />
             <Route path="/CreateVenue" element={<CreateVenue/>} />
-            <Route path="/Login" element = {<Login setVMStatus={setVMStatus} changePassword={changePassword} setAdminStatus = {setAdminStatus} ></Login>} />
+            <Route path="/Login" element = {<Login setVMStatus={setVMStatus} changePassword={changePassword} setAdminStatus = {setAdminStatus} setVMName={setVMName}></Login>} />
             </Routes>
           </HashRouter>
         </div>
@@ -93,9 +105,9 @@ export default function Seats4U () {
         </div>
 
         <Routes>
-        <Route path="/" element={ <SearchBar user={user}/> } />
+        <Route path="/" element={ <SearchBar user={user} password = {password}/> } />
         <Route path="/CreateVenue" element={<CreateVenue/>} />
-        <Route path="/CreateShow" element={<CreateShow user={user}/>} />
+        <Route path="/CreateShow" element={<CreateShow user={user} password={password} venueName={venueName}/>} />
         </Routes>
       </HashRouter>
       
@@ -116,10 +128,10 @@ export default function Seats4U () {
           </div>
   
           <Routes>
-          <Route path="/" element={ <SearchBar user={user}/> } />
+          <Route path="/" element={ <SearchBar user={user} password = {password}/> } />
           <Route path="/CreateVenue" element={<CreateVenue/>} />
           <Route path="/ListVenues" element={<ListVenues user = {user} password={password}/>} />
-          <Route path="/CreateShow" element={<CreateShow user={user}/>} />
+          <Route path="/CreateShow" element={<CreateShow user={user} password={password}/>} />
           </Routes>
         </HashRouter>
        
