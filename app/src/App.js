@@ -67,6 +67,7 @@ export default function Seats4U () {
     setPassword('')
     window.location.reload()
     window.location.href = '#/';
+    window.location.reload()
     
   }
   
