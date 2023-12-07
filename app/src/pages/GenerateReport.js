@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function GenerateReport(props){
@@ -8,6 +8,21 @@ export default function GenerateReport(props){
     const [authentication, setAuthentication] = useState('');
     const [auth, setAuth] = useState('');
     const [venueName, setVenueName] = useState(props.venueName);
+
+    function runHandleClick(){
+        (async () => {
+            try{
+                if(props.user == 1){
+                await handleClick()
+                }
+            }catch{
+
+            }
+        })();
+    }
+    useEffect(() => {
+        runHandleClick();
+      }, []);
 
     const handleClick = async () => {
        
@@ -76,7 +91,6 @@ export default function GenerateReport(props){
           }
         };
         function GenerateReport() {
-
             if(authentication == 200) {
               return (
                 <div style={{ maxWidth: '800px', margin: '0 auto', marginTop: '25px' }}>
@@ -139,7 +153,8 @@ export default function GenerateReport(props){
                     </center>
               </div>
               );
-          }
+          } 
+          
           return (
             <div>
                 <center>
@@ -148,4 +163,5 @@ export default function GenerateReport(props){
                 </center>
           </div>
           );
+          
         }
