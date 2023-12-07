@@ -8,8 +8,6 @@ import ListVenues from './pages/ListVenues.js';
 import GenerateReport from './pages/GenerateReport.js';
 
 
-
-
 export default function Seats4U () {
   const [user, setUser] = useState(0);
   const [password, setPassword] = useState('')

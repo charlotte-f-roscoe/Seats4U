@@ -107,7 +107,7 @@ export default function SearchBar (props) {
             <div key={show} style={{ maxWidth: '500px', margin: '0 auto', marginBottom: '5px' }}>
             <p style={{ backgroundColor: '#282A35', color: '#fff', padding: '9px', borderRadius: '3px', margin: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>{print_message}</span>
-              <input type="button" value="Delete Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>deleteShow(show.showID)} disabled={show.active} />
+              <input type="button" value="Delete Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>deleteShow(show.showID)}/>
             </p>
           </div>)
             setResult(printInfo);
@@ -128,7 +128,7 @@ export default function SearchBar (props) {
       <center><h1>You do not have authorization.</h1></center></div>);
     }
 
-console.log(resultsDisplayed)
+    
   if(props.user==0 && !resultsDisplayed){
     return (
       <div>
