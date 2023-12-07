@@ -61,10 +61,12 @@ export default function Seats4U () {
 
 
   const logOut = () =>{
+    window.location.reload()
     setConsumerStatus()
     setVenueName('')
-    window.location.href = '#/';
     setPassword('')
+    window.location.reload()
+    
   }
   
   if(user==0){

@@ -5,6 +5,7 @@ const SearchBar = (props) => {
 
   const [search, setSearch] = useState('');
   const [result, setResult] = useState('');
+  const [resultsDisplayed, setResultDisplayed] = useState(0);
 
   function getNormalTime(showTime){
     let hours = parseInt(showTime/100);
@@ -73,6 +74,7 @@ const SearchBar = (props) => {
           printInfo += show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
         }
         setResult(printInfo);
+      
       }else if(props.user==1){
         let printInfo = [];
         for (const show of resultData.shows) {
@@ -86,8 +88,10 @@ const SearchBar = (props) => {
               <input type="button" value="Delete Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>deleteShow(show.showID)} disabled={show.active} />
             </p>
           </div>)
-          setResult(printInfo);
         }
+        setResult(printInfo);
+        setResultDisplayed(1)
+        
         }else{
           let printInfo = [];
           for (const show of resultData.shows) {
@@ -101,8 +105,11 @@ const SearchBar = (props) => {
                 <input type="button" value="Delete Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>deleteShow(show.showID)} />
               </p>
             </div>)
-            setResult(printInfo);
+           
         }
+        setResult(printInfo);
+        setResultDisplayed(1)
+        
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -114,8 +121,8 @@ const SearchBar = (props) => {
       <center><h1>You do not have authorization.</h1></center></div>);
     }
 
-
-  if(props.user==0){
+console.log(resultsDisplayed)
+  if(props.user==0 && !resultsDisplayed){
     return (
       <div>
         <center>
