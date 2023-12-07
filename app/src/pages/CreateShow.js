@@ -11,11 +11,17 @@ export default function ListVenues(){
     const [date, setDate] = useState('');
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
-    //const [blocks, setBlocks] = useState([]);
+
+    const [blocks, setBlocks] = useState('');
     //const [newBlock, setNewBlock] = useState({ price: '', section: '', rows: [] });
+
     const [activity, setStatus] = useState('');
     const [defaultPrice, setDefaultPrice] = useState('');
     const [auth, setAuth] = useState('');
+
+    const [blocksButtonCondition, setblocksButtonCondition] = useState(false);
+    const [defaultPriceButtonCondition, setDefaultPriceButtonCondition] = useState(true);
+
 
     const [lBlock, setLBlock] = useState('');
     const [cBlock, setCBlock] = useState('');
@@ -56,7 +62,7 @@ export default function ListVenues(){
         }
       } 
 
-      console.log(payloadSaveShow)
+      
 
         try {
         const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/createShow', {
@@ -65,7 +71,6 @@ export default function ListVenues(){
         });
     
         const resultData = await response.json();
-        console.log(resultData)
         if (resultData.statusCode == '200') {
             alert("Your Show has been created!");
             // redirect to the home page after successful save
@@ -80,6 +85,53 @@ export default function ListVenues(){
 
     };
 
+    const ColorChangingButton = () => {
+        const [buttonColor, setButtonColor] = useState('#e0e0e0');
+      
+        const handleClick = () => {
+          setButtonColor((prevColor) => (prevColor === '#e0e0e0' ? '#6ceb8e' : '#e0e0e0'));
+          
+        };
+        return (
+          <input
+            type="button"
+            value=' '
+            style={{ 
+                backgroundColor: buttonColor,
+                borderRadius: '4px',
+                border: '1px solid #757575', 
+                padding: '6px', }}
+            onClick={handleClick}
+          />
+        );
+      };
+
+      const DefaultPriceButton = () => {
+        if (defaultPriceButtonCondition == true){
+            return (
+                <input style={{width: "50px"}} 
+            placeholder="Price" value={defaultPrice} 
+            onChange={(e) => setDefaultPrice(e.target.value)}/>
+              );
+        } else {
+            return (
+                ''
+              )
+        }
+      };
+      const BlocksButton = () => {
+        if (blocksButtonCondition == true){
+            return (
+                <input style={{width: "50px"}} 
+            placeholder="Blocks" value={blocks} 
+            onChange={(e) => setBlocks(e.target.value)}/>
+              );
+        } else {
+            return (
+                ''
+              )
+        }
+      };
 
     const handleClick = async () => {
         const payload = {
@@ -98,35 +150,28 @@ export default function ListVenues(){
             if(resultData.statusCode == "200"){
 
             
-            console.log(resultData.layout[0].leftRowNum)
-            console.log(resultData.layout[0].leftColNum)
-            console.log(resultData.layout[0].centerRowNum)
-            console.log(resultData.layout[0].centerColNum)
-            console.log(resultData.layout[0].rightRowNum)
-            console.log(resultData.layout[0].rightColNum)
-            
             setVenueName(resultData.layout[0].venueName)
 
             let Lblock = [];
-          let Cblock = [];
-          let Rblock = [];
+            let Cblock = [];
+            let Rblock = [];
               for (let i = 0; i < parseInt(resultData.layout[0].leftRowNum); i++){
                   for(let n=0; n< parseInt(resultData.layout[0].leftColNum); n++){
-                      Lblock.push(<input type="button" value=" " />);
+                      Lblock.push(<ColorChangingButton/>);
                   }
                   Lblock.push(<br/>);
               } setLBlock(Lblock)
 
               for (let i = 0; i <  parseInt(resultData.layout[0].rightRowNum); i++){
                   for(let n=0; n< parseInt(resultData.layout[0].rightColNum); n++){
-                      Cblock.push(<input type="button" value=" " />);
+                      Cblock.push(<ColorChangingButton/>);
                   }
                   Cblock.push(<br/>);
               }setCBlock(Cblock)
 
               for (let i = 0; i < parseInt(resultData.layout[0].rightRowNum); i++){
                   for(let n=0; n< parseInt(resultData.layout[0].rightColNum); n++){
-                      Rblock.push(<input type="button" value=" " />);
+                      Rblock.push(<ColorChangingButton/>);
                   }
                   Rblock.push(<br/>);
               } setRBlock(Rblock)
@@ -139,7 +184,6 @@ export default function ListVenues(){
         };
 
         function notauth(){
-          console.log(auth);
           if(auth=="400"){
             return (<div>
               <center><h1>You do not have authorization.</h1></center></div>);
@@ -225,10 +269,17 @@ export default function ListVenues(){
                     <label>
                       Pricing:
                       <br /><br />
-                      <input style={{width: "50px"}} placeholder="Price" value={defaultPrice} onChange={(e) => setDefaultPrice(e.target.value)}/>
-                      <button>Set Default Price</button>
+                      <DefaultPriceButton/>
+                      <br></br>
+                      <input type='button' value='Set Default Price' onClick={() => {
+                        setblocksButtonCondition(false)
+                        setDefaultPriceButtonCondition(true)}} />
                       <br /><br />
-                      <button>Create Blocks</button>
+                      <BlocksButton/>
+                      <br></br>
+                      <input type='button' value='Use Blocks' onClick={() => {
+                        setblocksButtonCondition(true)
+                        setDefaultPriceButtonCondition(false)}} />
                     </label>
                     </center>
                 </div>

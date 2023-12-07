@@ -7,6 +7,7 @@ import ErrorNotFound from "./pages/ErrorNotFound.js";
 import CreateShow from './pages/CreateShow.js';
 import ListVenues from './pages/ListVenues.js';
 import DeleteVenue from './pages/DeleteVenue.js';
+import Success from './pages/Success.js';
 
 
 const Seats4U = () => {
@@ -32,6 +33,8 @@ const Seats4U = () => {
           <Route path="/ListVenues" element={<ListVenues />} />
           <Route path="/ErrorNotFound" element={<ErrorNotFound />} />
           <Route path="/Login" element={<Login />} />
+          <Route path="/Success" element={<Success />} />
+
           </Routes>
         </HashRouter>
       </>
