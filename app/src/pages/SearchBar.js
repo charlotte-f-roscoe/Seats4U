@@ -1,7 +1,7 @@
 import React, { useState, createContext, useContext } from "react";
 
 
-const SearchBar = (props) => {
+export default function SearchBar (props) {
 
   const [search, setSearch] = useState('');
   const [result, setResult] = useState('');
@@ -53,6 +53,7 @@ const SearchBar = (props) => {
   
 
   const handleClick = async () => {
+
     const payload = {
       search: search,
     };
@@ -68,9 +69,13 @@ const SearchBar = (props) => {
       if(props.user==0){
         let printInfo = "";
         for (const show of resultData.shows) {
-          console.log(show);
-          const showTime = getNormalTime(show.startTime);
-          printInfo += show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
+          if(show.active){ // check if show is active then print out if true
+          //  for (const show of showsForVenueManager ) {
+            //console.log(show);
+            const showTime = getNormalTime(show.startTime);
+            //printInfo += show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
+              printInfo += show.showName + "\t" + (show.showDate?.substring(0, 10) || 'N/A') + " at " + showTime + "\t" + show.venueName + "\t" + "\n";
+          }
         }
         setResult(printInfo);
       }else if(props.user==1){
@@ -78,7 +83,7 @@ const SearchBar = (props) => {
         for (const show of resultData.shows) {
           console.log(show);
           const showTime = getNormalTime(show.startTime);
-          let print_message = show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive');
+          let print_message = show.showName + "\t" + (show.showDate?.substring(0, 10) || 'N/A') + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
           printInfo.push(
             <div key={show} style={{ maxWidth: '500px', margin: '0 auto', marginBottom: '5px' }}>
             <p style={{ backgroundColor: '#282A35', color: '#fff', padding: '9px', borderRadius: '3px', margin: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -93,14 +98,14 @@ const SearchBar = (props) => {
           for (const show of resultData.shows) {
             console.log(show);
             const showTime = getNormalTime(show.startTime);
-            let print_message = show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive');
-            printInfo.push(
-              <div key={show} style={{ maxWidth: '500px', margin: '0 auto', marginBottom: '5px' }}>
-              <p style={{ backgroundColor: '#282A35', color: '#fff', padding: '9px', borderRadius: '3px', margin: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>{print_message}</span>
-                <input type="button" value="Delete Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>deleteShow(show.showID)} />
-              </p>
-            </div>)
+            let print_message = show.showName + "\t" + (show.showDate?.substring(0, 10) || 'N/A') + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
+          printInfo.push(
+            <div key={show} style={{ maxWidth: '500px', margin: '0 auto', marginBottom: '5px' }}>
+            <p style={{ backgroundColor: '#282A35', color: '#fff', padding: '9px', borderRadius: '3px', margin: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>{print_message}</span>
+              <input type="button" value="Delete Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>deleteShow(show.showID)} disabled={show.active} />
+            </p>
+          </div>)
             setResult(printInfo);
         }
       }
@@ -108,6 +113,8 @@ const SearchBar = (props) => {
       console.error('Error fetching data:', error);
     }
   };
+
+
 
   function notauth(){  
     return (<div>
@@ -137,7 +144,7 @@ const SearchBar = (props) => {
                 <tr>
                   <th>Name</th>
                   <th>Date/Time</th>
-                  <th>Status</th>
+                  <th>Venue</th>
                 </tr>
               </thead>
               <tbody>
@@ -228,4 +235,5 @@ const SearchBar = (props) => {
 
   
 };
-export default SearchBar;
+
+      
