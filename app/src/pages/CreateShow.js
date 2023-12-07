@@ -10,6 +10,7 @@ export default function CreateShow(props){
 
     const [defaultPrice, setDefaultPrice] = useState('');
 
+
     const [lBlock, setLBlock] = useState('');
     const [cBlock, setCBlock] = useState('');
     const [rBlock, setRBlock] = useState('');
@@ -17,9 +18,17 @@ export default function CreateShow(props){
 
     const handleSave = async (event, status) => {
       let payloadSaveShow = {};
+      let vmName = ""
+
+      if(props.user==1){
+        vmName = props.venueName
+      }else{
+        vmName = venueName
+      }
+
       if(status === true){
         payloadSaveShow = {
-          venueName : props.venueName,
+          venueName : vmName,
           show : {
             showName : showName,
             showDate : date,
@@ -34,7 +43,7 @@ export default function CreateShow(props){
         }
       } else {
         payloadSaveShow = {
-          venueName : props.venueName,
+          venueName : vmName,
           show : {
             showName : showName,
             showDate : date,
@@ -144,7 +153,7 @@ export default function CreateShow(props){
         }
     
         function CreateShow() {       
-            return (<div>
+          return (<div>
             <center>
               <h1>Create Show</h1>
               <label>Venue Name: {props.venueName}</label> 
@@ -245,10 +254,123 @@ export default function CreateShow(props){
             <br /><br />
           </div>);
         }
+        function CreateShowAdmin() {       
+          return (<div>
+          <center>
+            <h1>Create Show</h1>
+            
+            <label>
+              Venue Name:
+              <input
+                value={venueName}
+                onChange={(e) => setVenueName(e.target.value)}
+                required
+              />
+            </label>
+            <br></br><br></br>
+            <label>
+              Show Name: 
+              <input
+              placeholder='Enter Show Name'
+              value={showName}
+              onChange={(e) => setShowName(e.target.value)}
+              />
+            </label>
+            <br /><br />
+            <label>
+              Date:
+              <input
+                type="date"
+                id="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                required
+              />
+            </label>
+            <br /><br />
+            <label>
+              Start Time: 
+              <input
+                type="time"
+                id="startTime"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                required
+              />
+            </label>
+            <br /><br />
+            <label>
+              End Time:
+              <input
+                type="time"
+                id="endTime"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                required
+              />
+            </label>
+          </center>
+          <br></br>
+          <center>
+          <Link to="/"><input type="button" value="Cancel & Exit" style={{ backgroundColor: 'red', color: 'white', marginRight: '40px'}}/></Link>
+            <input type="button" value="Save Inactive Show & Exit Show" style={{marginRight: '40px'}} onClick= {(e) => handleSave(e, false)} />
+            <input type="button" value="Activate & Exit Show" onClick= {(e) => handleSave(e, true)}/>
+          </center>
+          <center><h1>Stage</h1></center>
+          <style
+              dangerouslySetInnerHTML={{
+              __html:
+                  '\n* {\n  box-sizing: border-box;\n}\n\n\n.column {\n  float: left;\n  width: 50%;\n  padding: 10px;\n \n}\n\n\n.row:after {\n  content: "";\n  display: table;\n  clear: both;\n}\n'
+              }}
+          />
+              <div className="column" style={{ backgroundColor: "#fff" }}>
+                  <center>
+                  <br/><br/>
+                  <label>
+                    Pricing:
+                    <br /><br />
+                    <input style={{width: "50px"}} placeholder="Price" value={defaultPrice} onChange={(e) => setDefaultPrice(e.target.value)}/>
+                    <button>Set Default Price</button>
+                    <br /><br />
+                    <button>Create Blocks</button>
+                  </label>
+                  </center>
+              </div>
+              
+              <div className="column" style={{ backgroundColor: "#fff" }}>
+                  <center>
+                  <style
+                  dangerouslySetInnerHTML={{
+                  __html:
+                                  '\n* {\n  box-sizing: border-box;\n}\n\n\n.column {\n  float: left;\n  width: 33.33%;\n  padding: 10px;\n /\n}\n\n\n.row:after {\n  content: "";\n  display: table;\n  clear: both;\n}\n'
+                              }}
+                  />
+                  <div className="row">
+                      <div className="column" style={{ backgroundColor: "#fff" }}>
+                          <h3>Side Left</h3>
+                          {lBlock}
+                      </div>
+                      <div className="column" style={{ backgroundColor: "#fff" }}>
+                          <h3>Center</h3>
+                          {cBlock}
+                      </div>
+                      <div className="column" style={{ backgroundColor: "#fff" }}>
+                          <h3>Side Right</h3>
+                          {rBlock}
+                      </div>
+                  </div>
+                  </center>
+              </div>
+          <br /><br />
+        </div>);
+      }
 
-    if(props.user==1 ||props.user==2 ){
+    if(props.user==1 ){
       return CreateShow();
-    }else{
+    }if(props.user == 2){
+      return CreateShowAdmin();
+    }
+    else{
         return notauth();
     }
 
