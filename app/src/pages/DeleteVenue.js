@@ -29,7 +29,7 @@ export default function DeleteVenue(props){
 
         const deleteVenue = async () => {
             const payload = {
-                venueManager: props.password,
+                authentication: props.password,
                 venueName: props.venueName
             };
 

@@ -69,6 +69,7 @@ export default function SearchBar (props) {
 
       if(resultData.statusCode==200){
         alert("Show has been deleted. \t" + resultData.body)
+        window.location.reload()
       }
       else{
         alert("Unable to delete show. \t" + resultData.error)

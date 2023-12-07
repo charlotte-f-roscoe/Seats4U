@@ -66,6 +66,8 @@ export default function Seats4U () {
     setVenueName('')
     setPassword('')
     window.location.reload()
+    window.location.href = '#/';
+    window.location.reload()
     
   }
   
@@ -137,7 +139,7 @@ export default function Seats4U () {
           <Routes>
           <Route path="/" element={ <SearchBar user={user} password = {password}/> } />
           <Route path="/CreateVenue" element={<CreateVenue/>} />
-          <Route path="/ListVenues" element={<ListVenues user = {user} password={password}/>} />
+          <Route path="/ListVenues" element={<ListVenues user = {user} password={password} logOut = {logOut}/>} />
           <Route path="/CreateShow" element={<CreateShow user={user} password={password}/>} />
           <Route path="/GenerateReport" element={<GenerateReport user={user} password={password} venueName = {venueName}/>} />
           </Routes>
