@@ -92,6 +92,7 @@ export default function SearchBar (props) {
 
       if(resultData.statusCode==200){
         alert("Show has been activated. \t" + resultData.body)
+        window.location.reload()
       }
       else{
         alert("Unable to activate show. \t" + resultData.error)
@@ -174,6 +175,7 @@ export default function SearchBar (props) {
               <p style={{ backgroundColor: '#282A35', color: '#fff', padding: '9px', borderRadius: '3px', margin: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span>{print_message}</span>
                 <input type="button" value="Delete Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>deleteShow(show.showID)}  />
+              <input type="button" value="Activate Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>activateShow(show.showID)} disabled={show.active}/>
               </p>
             </div>)
           }
@@ -192,7 +194,7 @@ export default function SearchBar (props) {
             <p style={{ backgroundColor: '#282A35', color: '#fff', padding: '9px', borderRadius: '3px', margin: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>{print_message}</span>
               <input type="button" value="Delete Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>deleteShow(show.showID)}/>
-              <input type="button" value="Activate Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>activateShow(show.showID)}/>
+              <input type="button" value="Activate Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>activateShow(show.showID)} disabled={show.active}/>
             </p>
           </div>)
             setResult(printInfo);
