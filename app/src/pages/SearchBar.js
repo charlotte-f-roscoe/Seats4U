@@ -167,14 +167,16 @@ export default function SearchBar (props) {
         for (const show of resultData.shows) {
           console.log(show);
           const showTime = getNormalTime(show.startTime);
-          let print_message = show.showName + "\t" + (show.showDate?.substring(0, 10) || 'N/A') + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
-          printInfo.push(
-            <div key={show} style={{ maxWidth: '500px', margin: '0 auto', marginBottom: '5px' }}>
-            <p style={{ backgroundColor: '#282A35', color: '#fff', padding: '9px', borderRadius: '3px', margin: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>{print_message}</span>
-              <input type="button" value="Delete Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>deleteShow(show.showID)}  />
-            </p>
-          </div>)
+          if(show.venueName==props.venueName){
+            let print_message = show.showName + "\t" + (show.showDate?.substring(0, 10) || 'N/A') + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
+            printInfo.push(
+              <div key={show} style={{ maxWidth: '500px', margin: '0 auto', marginBottom: '5px' }}>
+              <p style={{ backgroundColor: '#282A35', color: '#fff', padding: '9px', borderRadius: '3px', margin: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>{print_message}</span>
+                <input type="button" value="Delete Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>deleteShow(show.showID)}  />
+              </p>
+            </div>)
+          }
         }
         setResult(printInfo);
         setResultDisplayed(1)

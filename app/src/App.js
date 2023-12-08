@@ -111,7 +111,7 @@ export default function Seats4U () {
         </div>
 
         <Routes>
-        <Route path="/" element={ <SearchBar user={user} password = {password}/> } />
+        <Route path="/" element={ <SearchBar user={user} password = {password} venueName={venueName}/> } />
         <Route path="/CreateVenue" element={<CreateVenue/>} />
         <Route path="/CreateShow" element={<CreateShow user={user} password={password} venueName={venueName}/>} />
         <Route path='/DeleteVenue' element={<DeleteVenue password={password} logOut = {logOut} venueName={venueName}/>} />
