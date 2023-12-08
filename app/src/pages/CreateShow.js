@@ -109,26 +109,26 @@ export default function CreateShow(props){
             
             setVenueName(resultData.layout[0].venueName)
 
-            let Lblock = [];
+          let Lblock = [];
           let Cblock = [];
           let Rblock = [];
               for (let i = 0; i < parseInt(resultData.layout[0].leftRowNum); i++){
                   for(let n=0; n< parseInt(resultData.layout[0].leftColNum); n++){
-                      Lblock.push("☐");
+                      Lblock.push(<input type='button' value=' '/>);
                   }
                   Lblock.push(<br/>);
               } setLBlock(Lblock)
 
               for (let i = 0; i <  parseInt(resultData.layout[0].rightRowNum); i++){
                   for(let n=0; n< parseInt(resultData.layout[0].rightColNum); n++){
-                      Cblock.push("☐");
+                      Cblock.push(<input type='button' value=' '/>);
                   }
                   Cblock.push(<br/>);
               }setCBlock(Cblock)
 
               for (let i = 0; i < parseInt(resultData.layout[0].rightRowNum); i++){
                   for(let n=0; n< parseInt(resultData.layout[0].rightColNum); n++){
-                      Rblock.push("☐");
+                      Rblock.push(<input type='button' value=' '/>);
                   }
                   Rblock.push(<br/>);
               } setRBlock(Rblock)
@@ -152,7 +152,7 @@ export default function CreateShow(props){
           return currentTime;
         }
     
-        function CreateShow() {       
+        function CreateShow() {    
           return (<div>
             <center>
               <h1>Create Show</h1>
@@ -206,7 +206,9 @@ export default function CreateShow(props){
               <input type="button" value="Save Inactive Show & Exit Show" style={{marginRight: '40px'}} onClick= {(e) => handleSave(e, false)} />
               <input type="button" value="Activate & Exit Show" onClick= {(e) => handleSave(e, true)}/>
             </center>
-            <center><h1>Stage</h1></center>
+            <center><h1>Stage</h1>
+            <br></br>
+            <input type='button' value='Cheese'/></center>
             <style
                 dangerouslySetInnerHTML={{
                 __html:
@@ -254,7 +256,7 @@ export default function CreateShow(props){
             <br /><br />
           </div>);
         }
-        function CreateShowAdmin() {       
+        function CreateShowAdmin() {    
           return (<div>
           <center>
             <h1>Create Show</h1>
@@ -316,7 +318,11 @@ export default function CreateShow(props){
             <input type="button" value="Save Inactive Show & Exit Show" style={{marginRight: '40px'}} onClick= {(e) => handleSave(e, false)} />
             <input type="button" value="Activate & Exit Show" onClick= {(e) => handleSave(e, true)}/>
           </center>
-          <center><h1>Stage</h1></center>
+          <center><h1>Stage</h1>
+          <br></br>
+          <input type='button' value='Cheese'/>
+          </center>
+          
           <style
               dangerouslySetInnerHTML={{
               __html:
