@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 export default function CreateShow(props){
 
@@ -14,6 +14,67 @@ export default function CreateShow(props){
     const [lBlock, setLBlock] = useState('');
     const [cBlock, setCBlock] = useState('');
     const [rBlock, setRBlock] = useState('');
+
+    useEffect (() => {
+        const fetchData = async () => {
+            const payload = {
+                authentication: props.password,
+            };
+    
+            try {
+                const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/checkVenueManager', 
+                {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                });
+            
+                const resultData = await response.json();
+                console.log("Start")
+                console.log(resultData)
+                console.log("End")
+                if(resultData.statusCode == "200"){
+    
+                
+                console.log(resultData.layout[0].leftRowNum)
+                console.log(resultData.layout[0].leftColNum)
+                console.log(resultData.layout[0].centerRowNum)
+                console.log(resultData.layout[0].centerColNum)
+                console.log(resultData.layout[0].rightRowNum)
+                console.log(resultData.layout[0].rightColNum)
+                
+                setVenueName(resultData.layout[0].venueName)
+    
+                let Lblock = [];
+                let Cblock = [];
+                let Rblock = [];
+                    for (let i = 0; i < parseInt(resultData.layout[0].leftRowNum); i++){
+                        for(let n=0; n< parseInt(resultData.layout[0].leftColNum); n++){
+                            Lblock.push(<input type='button' value=' '/>);
+                        }
+                        Lblock.push(<br/>);
+                    } setLBlock(Lblock)
+    
+                    for (let i = 0; i <  parseInt(resultData.layout[0].rightRowNum); i++){
+                        for(let n=0; n< parseInt(resultData.layout[0].rightColNum); n++){
+                            Cblock.push(<input type='button' value=' '/>);
+                        }
+                        Cblock.push(<br/>);
+                    }setCBlock(Cblock)
+    
+                    for (let i = 0; i < parseInt(resultData.layout[0].rightRowNum); i++){
+                        for(let n=0; n< parseInt(resultData.layout[0].rightColNum); n++){
+                            Rblock.push(<input type='button' value=' '/>);
+                        }
+                        Rblock.push(<br/>);
+                    } setRBlock(Rblock)
+                }
+                
+                } catch (error) {
+                console.error('Error fetching data:', error);
+                }
+        }
+        fetchData();
+    }, [])
 
 
     const handleSave = async (event, status) => {
@@ -82,64 +143,6 @@ export default function CreateShow(props){
 
     };
 
-
-    const handleClick = async () => {
-        const payload = {
-          authentication: props.password,
-        };
-
-        try {
-            const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/logIn', 
-            {
-              method: 'POST',
-              body: JSON.stringify(payload),
-            });
-      
-            const resultData = await response.json();
-            console.log(resultData)
-            if(resultData.statusCode == "200"){
-
-            
-            console.log(resultData.layout[0].leftRowNum)
-            console.log(resultData.layout[0].leftColNum)
-            console.log(resultData.layout[0].centerRowNum)
-            console.log(resultData.layout[0].centerColNum)
-            console.log(resultData.layout[0].rightRowNum)
-            console.log(resultData.layout[0].rightColNum)
-            
-            setVenueName(resultData.layout[0].venueName)
-
-          let Lblock = [];
-          let Cblock = [];
-          let Rblock = [];
-              for (let i = 0; i < parseInt(resultData.layout[0].leftRowNum); i++){
-                  for(let n=0; n< parseInt(resultData.layout[0].leftColNum); n++){
-                      Lblock.push(<input type='button' value=' '/>);
-                  }
-                  Lblock.push(<br/>);
-              } setLBlock(Lblock)
-
-              for (let i = 0; i <  parseInt(resultData.layout[0].rightRowNum); i++){
-                  for(let n=0; n< parseInt(resultData.layout[0].rightColNum); n++){
-                      Cblock.push(<input type='button' value=' '/>);
-                  }
-                  Cblock.push(<br/>);
-              }setCBlock(Cblock)
-
-              for (let i = 0; i < parseInt(resultData.layout[0].rightRowNum); i++){
-                  for(let n=0; n< parseInt(resultData.layout[0].rightColNum); n++){
-                      Rblock.push(<input type='button' value=' '/>);
-                  }
-                  Rblock.push(<br/>);
-              } setRBlock(Rblock)
-            }
-            
-          } catch (error) {
-            console.error('Error fetching data:', error);
-          }
-          
-        };
-
         function notauth(){  
             return (<div>
               <center><h1>You do not have authorization.</h1></center></div>);
@@ -206,9 +209,7 @@ export default function CreateShow(props){
               <input type="button" value="Save Inactive Show & Exit Show" style={{marginRight: '40px'}} onClick= {(e) => handleSave(e, false)} />
               <input type="button" value="Activate & Exit Show" onClick= {(e) => handleSave(e, true)}/>
             </center>
-            <center><h1>Stage</h1>
-            <br></br>
-            <input type='button' value='Cheese'/></center>
+            <center><h1>Stage</h1></center>
             <style
                 dangerouslySetInnerHTML={{
                 __html:
@@ -319,8 +320,6 @@ export default function CreateShow(props){
             <input type="button" value="Activate & Exit Show" onClick= {(e) => handleSave(e, true)}/>
           </center>
           <center><h1>Stage</h1>
-          <br></br>
-          <input type='button' value='Cheese'/>
           </center>
           
           <style
