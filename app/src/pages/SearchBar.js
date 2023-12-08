@@ -46,7 +46,7 @@ export default function SearchBar (props) {
         if (resultData.statusCode == '200') {
             alert("Your Seats have been purchased!");
             // redirect to the home page after successful save
-            window.location.href = '#/Success';
+            window.location.reload;
         } else {
             alert('Error Purchasing Tickets. Please try again.\n' + resultData.error);
         }
