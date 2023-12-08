@@ -76,6 +76,35 @@ export default function SearchBar (props) {
     }
   }
 
+  const activateShow = async (showID) => {
+    const payload = {
+      showID: showID,
+      authentication: props.password
+  };
+   try {
+    const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/activateShow', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+   });
+   console.log(payload)
+
+   const resultData = await response.json();
+
+      if(resultData.statusCode==200){
+        alert("Show has been activated. \t" + resultData.body)
+      }
+      else{
+        alert("Unable to activate show. \t" + resultData.error)
+      }
+      console.log(resultData)
+      
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+
+  }
+
+
   const deleteShow = async (showID) => {
     const payload = {
       showID: showID,
@@ -93,6 +122,7 @@ export default function SearchBar (props) {
 
       if(resultData.statusCode==200){
         alert("Show has been deleted. \t" + resultData.body)
+        window.location.reload()
       }
       else{
         alert("Unable to delete show. \t" + resultData.error)
@@ -142,7 +172,7 @@ export default function SearchBar (props) {
             <div key={show} style={{ maxWidth: '500px', margin: '0 auto', marginBottom: '5px' }}>
             <p style={{ backgroundColor: '#282A35', color: '#fff', padding: '9px', borderRadius: '3px', margin: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>{print_message}</span>
-              <input type="button" value="Delete Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>deleteShow(show.showID)} disabled={show.active} />
+              <input type="button" value="Delete Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>deleteShow(show.showID)}  />
             </p>
           </div>)
         }
@@ -160,6 +190,7 @@ export default function SearchBar (props) {
             <p style={{ backgroundColor: '#282A35', color: '#fff', padding: '9px', borderRadius: '3px', margin: '0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>{print_message}</span>
               <input type="button" value="Delete Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>deleteShow(show.showID)}/>
+              <input type="button" value="Activate Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>activateShow(show.showID)}/>
             </p>
           </div>)
             setResult(printInfo);
