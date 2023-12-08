@@ -457,6 +457,11 @@ export default function SearchBar (props) {
           <br /><br />
           <input
             type="button"
+            value="Cancel and Exit"
+            onClick={() => {window.location.reload()}}
+            />
+          <input
+            type="button"
             value="Purchase Seats"
             onClick={purchaseSeats}
             />
