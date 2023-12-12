@@ -158,7 +158,7 @@ export default function SearchBar (props) {
           //  for (const show of showsForVenueManager ) {
             //console.log(show);
             const showTime = getNormalTime(show.startTime);
-            printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\t" + "View Show" + "\n";
+            printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + show.venueName + "\t" + "View Show" + "\n";
             }
         }
         setResult(printInfo);
@@ -382,7 +382,7 @@ export default function SearchBar (props) {
                         <th>ID</th>
                         <th>Name</th>
                         <th>Date/Time</th>
-                        <th>Status</th>
+                        <th>Venue Name</th>
                         <th>&#8203;</th>
                     </tr>
                     </thead>
