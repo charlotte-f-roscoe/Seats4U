@@ -1,5 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+
+const BoxInput = ({ onAddBlock}) => {
+    const [startRow, setStartRow] = useState('');
+    const [endRow, setEndRow] = useState('');
+    const [price, setPrice] = useState('');
+    const [section, setSection] = useState('left');
+    const [rows, setRows] = useState('')
+  
+    const handleAddBlock = async () => {
+      if (startRow.trim() === '' || endRow.trim() === '' || price.trim() === '') {
+        alert('Please fill in all input fields');
+        return;
+      }
+
+      onAddBlock({price, section, rows:[parseInt(startRow), parseInt(endRow)]});
+
+      setSection('left');
+      setStartRow('');
+      setEndRow('');
+      setPrice('');
+      setRows('')
+    };
+  
+    return (
+      <div className="box-container" style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '5px', width: '200px' }}>
+          <center>
+          <label htmlFor="section">Section: </label>
+        <select id="section" value={section} onChange={(e) => setSection(e.target.value)}>
+          <option value="left">left</option>
+          <option value="center">center</option>
+          <option value="right">right</option>
+        </select>
+        <br></br>
+        <label htmlFor="startRow">Start Row: </label>
+        <input type="text" style={{width: "50px"}} id="startRow" value={startRow} onChange={(e) => setStartRow(e.target.value)} required />
+        <br></br>
+        <label htmlFor="endRow">End Row: </label>
+        <input type="text" style={{width: "50px"}} id="endRow" value={endRow} onChange={(e) => setEndRow(e.target.value)} required />
+        <br></br>
+        <label htmlFor="price">Price: </label>
+        <input type="text" style={{width: "50px"}} id="price" value={price} onChange={(e) => setPrice(e.target.value)} required />
+        <br></br>
+        <button onClick={handleAddBlock}>Add Block</button>
+        </center>
+      </div>
+    );
+  };
+
 export default function CreateShow(props){
 
     const [venueName, setVenueName] = useState('');
@@ -10,11 +58,58 @@ export default function CreateShow(props){
 
     const [defaultPrice, setDefaultPrice] = useState('');
 
+    const [blocks, setBlocks] = useState('');
+    const [blockInputs, setBlockInputs] = useState([]);
+    const [blocksButtonCondition, setblocksButtonCondition] = useState(false);
+    const [defaultPriceButtonCondition, setDefaultPriceButtonCondition] = useState(true);
+
+    const [boxes, setBoxes] = useState([]);
+
+    const [checkBlocks, setCheckBlocks] = useState('');
 
     const [lBlock, setLBlock] = useState('');
     const [cBlock, setCBlock] = useState('');
     const [rBlock, setRBlock] = useState('');
     const[adminGiveVenueName, setAdminGiveVenueName] = useState(0)
+
+    const [payloadBlockCheck, setPayloadBlockCheck] = useState('')
+
+    const handleAddBlock = async (boxData) => {
+
+        setCheckBlocks([...boxes, boxData]);
+        //setBoxes([...boxes, boxData]);     
+    
+    };
+
+    useEffect(() => {
+        setPayloadBlockCheck({
+            venueName: venueName,
+            blocks: checkBlocks
+        })
+      }, [checkBlocks]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/checkBlocksValid', 
+                {
+                    method: 'POST',
+                    body: JSON.stringify(payloadBlockCheck),
+                });
+            
+                const resultData = await response.json();
+                console.log(resultData)
+                if(resultData.statusCode == "200"){
+                    setBoxes(checkBlocks);
+                } else if(resultData.error.substring(0,6) === "blocks"){
+                    alert(resultData.error)
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+        fetchData();
+    }, [payloadBlockCheck])
 
     useEffect (() => {
         const fetchData = async () => {
@@ -30,19 +125,8 @@ export default function CreateShow(props){
                 });
             
                 const resultData = await response.json();
-                console.log("Start")
-                console.log(resultData)
-                console.log("End")
                 if(resultData.statusCode == "200"){
     
-                
-                console.log(resultData.layout[0].leftRowNum)
-                console.log(resultData.layout[0].leftColNum)
-                console.log(resultData.layout[0].centerRowNum)
-                console.log(resultData.layout[0].centerColNum)
-                console.log(resultData.layout[0].rightRowNum)
-                console.log(resultData.layout[0].rightColNum)
-                
                 setVenueName(resultData.layout[0].venueName)
     
                 let Lblock = [];
@@ -60,7 +144,7 @@ export default function CreateShow(props){
                             Cblock.push(<input type='button' value=' '/>);
                         }
                         Cblock.push(<br/>);
-                    }setCBlock(Cblock)
+                    } setCBlock(Cblock)
     
                     for (let i = 0; i < parseInt(resultData.layout[0].rightRowNum); i++){
                         for(let n=0; n< parseInt(resultData.layout[0].rightColNum); n++){
@@ -77,6 +161,56 @@ export default function CreateShow(props){
         fetchData();
     }, [])
 
+    
+    const DefaultPriceButton = () => {
+        if (defaultPriceButtonCondition === true){
+            return (
+                <div>
+                    <input style={{width: "50px"}} 
+                    placeholder="Price" value={defaultPrice} 
+                    onChange={(e) => setDefaultPrice(e.target.value)}/>
+                    <input type='button' value='SET'/>
+                </div>
+              );
+        } else {
+            return (
+                ''
+              )
+        }
+      };
+    const removeBlock = async (index) => {
+        console.log(boxes)
+        console.log(index)
+        setBoxes((prevBoxes) => {
+            const newArray = [...prevBoxes];
+            newArray.splice(index, 1);
+            return newArray;
+          });
+
+    }
+
+      const BlocksButton = () => {
+        if (blocksButtonCondition === true){
+            return (
+                <div>
+                    {boxes.map((box, index) => (
+                    <div key={index} style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '5px', width: '200px' }} className={`box-container ${box.section}`}>
+                        <p>Section: {box.section}</p>
+                        <p>Start Row: {box.rows[0]}</p>
+                        <p>End Row: {box.rows[1]}</p>
+                        <p>Price: {box.price}</p>
+                        <button onClick= {() =>{removeBlock(index)}}>Remove Block</button>
+                    </div>
+                    ))}
+                    <BoxInput onAddBlock={handleAddBlock}/>
+                </div>
+              );  
+        } else {
+            return (
+                ''
+              )
+        }
+      };
 
     const handleSave = async (event, status) => {
       let payloadSaveShow = {};
@@ -87,6 +221,9 @@ export default function CreateShow(props){
       }else{
         vmName = venueName
       }
+      if (boxes.length === 0) {
+        setBoxes(-1)
+      }
 
       if(status === true){
         payloadSaveShow = {
@@ -96,7 +233,7 @@ export default function CreateShow(props){
             showDate : date,
             startTime : computeTime(startTime),
             endTime : computeTime(endTime),
-            blocks: [ ],
+            blocks: boxes,
             defaultPrice : defaultPrice,
             active: true,
             soldOut: false, 
@@ -111,7 +248,7 @@ export default function CreateShow(props){
             showDate : date,
             startTime : computeTime(startTime),
             endTime : computeTime(endTime),
-            blocks: [ ],
+            blocks: boxes,
             defaultPrice : defaultPrice,
             active: false,
             soldOut: false, 
@@ -121,7 +258,6 @@ export default function CreateShow(props){
       } 
 
       console.log(payloadSaveShow)
-
         try {
         const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/createShow', {
             method: 'POST',
@@ -129,7 +265,6 @@ export default function CreateShow(props){
         });
     
         const resultData = await response.json();
-        console.log(resultData)
         if (resultData.statusCode == '200') {
             alert("Your Show has been created!");
             // redirect to the home page after successful save
@@ -223,10 +358,22 @@ export default function CreateShow(props){
                     <label>
                       Pricing:
                       <br /><br />
-                      <input style={{width: "50px"}} placeholder="Price" value={defaultPrice} onChange={(e) => setDefaultPrice(e.target.value)}/>
-                      <button>Set Default Price</button>
+                      <DefaultPriceButton/>
+                      <br></br>
+                      <input type='button' value='Set Default Price' disabled={defaultPriceButtonCondition} onClick={() => {
+                        setblocksButtonCondition(false)
+                        setDefaultPrice('')
+                        setBlocks('')
+                        setBlockInputs('')
+                        setBoxes([])
+                        setDefaultPriceButtonCondition(true)}} />
                       <br /><br />
-                      <button>Create Blocks</button>
+                      <BlocksButton/>
+                      <br></br>
+                      <input type='button' value='Use Blocks' disabled={blocksButtonCondition} onClick={() => {
+                        setDefaultPrice(-1)
+                        setblocksButtonCondition(true)
+                        setDefaultPriceButtonCondition(false)}} />
                     </label>
                     </center>
                 </div>
@@ -259,7 +406,6 @@ export default function CreateShow(props){
           </div>);
         }
         function CreateShowAdmin() {  
-          console.log(adminGiveVenueName)
           if(adminGiveVenueName){
               return CreateShow()
           }  
@@ -271,7 +417,6 @@ export default function CreateShow(props){
           authentication: props.password,
         };
 
-        console.log(payload)
         
         try {
           const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/checkVenueManager', 
@@ -281,18 +426,8 @@ export default function CreateShow(props){
           });
       
           const resultData = await response.json();
-          console.log("Start")
-          console.log(resultData)
-          console.log("End")
           if(resultData.statusCode == "200"){
 
-          
-          console.log(resultData.layout[0].leftRowNum)
-          console.log(resultData.layout[0].leftColNum)
-          console.log(resultData.layout[0].centerRowNum)
-          console.log(resultData.layout[0].centerColNum)
-          console.log(resultData.layout[0].rightRowNum)
-          console.log(resultData.layout[0].rightColNum)
           
           setVenueName(resultData.layout[0].venueName)
 
