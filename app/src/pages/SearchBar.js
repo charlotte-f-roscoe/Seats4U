@@ -351,11 +351,19 @@ export default function SearchBar (props) {
 
       if(props.user==0){
         let printInfo = "";
+        console.log(resultData)
         for (const show of resultData.shows) {
           if(show.active){ // check if show is active then print out if true
           //  for (const show of showsForVenueManager ) {
+            //console.log(show);
             const showTime = getNormalTime(show.startTime);
-            printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + show.venueName + "\t" + "View Show" + "\n";
+           printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + show.venueName + "\t" +  "View Show"+ "\n";
+          // Check if the show is sold 
+          if (show.soldout === 1) {
+            
+            printInfo += "SOLD OUT" + "\n";
+            
+          } 
             }
         }
         setResult(printInfo);
