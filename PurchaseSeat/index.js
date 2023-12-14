@@ -16,36 +16,52 @@ exports.handler = async (event) => {
       pool.query("SELECT active FROM Shows WHERE showID=?",[showID], (error,rows) => {
         if(error) { return reject(error); }
         if(rows && rows.length == 1 && rows[0].active == 1) {
-            resolve(rows);
+          return resolve(rows);
         } else if(rows && rows.length == 1 && rows[0].active != 1) {
-          reject("Show is not active");
-        }         else {
-          reject("Show does not exist");
+          return reject("Show is not active");
+        } else {
+          return reject("Show does not exist");
         }
       });
     });
   };
   
-  let ValidSeat = (showID,row,col) => {
+  let ValidSeat = (showID,row,col,section) => {
     return new Promise((resolve, reject) => {
-      pool.query("SELECT available FROM Seats WHERE showID=? AND rowNum=? AND colNum=?",[showID,row,col], (error,rows) => {
+      pool.query("SELECT available FROM Seats WHERE showID=? AND rowNum=? AND colNum=? AND seatSection=?",[showID,row,col,section], (error,rows) => {
         if(error) { return reject(error); }
         if(rows && rows.length == 1 && rows[0].available == 1) {
-          resolve(rows);
+          return resolve(rows);
         } else if(rows && rows.length == 1 && rows[0].available != 1) {
-          reject("Seat "+row+", "+col+" is not available");
+          return reject("Seat "+row+", "+col+" is not available");
         } else {
-          reject("Seat "+row+", "+col+" does not exist");
+          return reject("Seat "+row+", "+col+" does not exist");
         }
       });
     });
   };
   
-  let PurchaseSeat = (showID,row,col) => {
+  let PurchaseSeat = (showID,row,col,section) => {
     return new Promise((resolve, reject) => {
-      pool.query("UPDATE Seats SET available=? WHERE showID=? AND available=? AND rowNum=? AND colNum=?",[0,showID,1,row,col], (error,rows) => {
+      pool.query("UPDATE Seats SET available=? WHERE showID=? AND available=? AND rowNum=? AND colNum=? AND seatSection=?",[0,showID,1,row,col,section], (error,rows) => {
         if(error) { return reject(error); }
-        resolve(rows);
+        return resolve(rows);
+      });
+    });
+  };
+  let IsSoldOut = (showID) => {
+    return new Promise((resolve, reject) => {
+      pool.query("SELECT * FROM Seats WHERE showID=? AND available=?",[showID,1], (error,rows) => {
+        if(error) { return reject(error); }
+        return resolve(rows.length === 0);
+      });
+    });
+  };
+  let SetSoldOut = (showID) => {
+    return new Promise((resolve, reject) => {
+      pool.query("UPDATE Shows SET soldOut=? WHERE showID=?",[1,showID], (error,rows) => {
+        if(error) { return reject(error); }
+        return resolve(rows);
       });
     });
   };
@@ -56,18 +72,19 @@ exports.handler = async (event) => {
     let seats = event.seats;
     await ValidShow(event.showID);
     for(let i=0;i<seats.length;i++) {
-      await ValidSeat(event.showID,seats[i].location[0],seats[i].location[1]);
+      await ValidSeat(event.showID,seats[i].location[0]+1,seats[i].location[1]+1,seats[i].section);
     }
     for(let i=0;i<seats.length;i++) {
-      await PurchaseSeat(event.showID,seats[i].location[0],seats[i].location[1]);
+      await PurchaseSeat(event.showID,seats[i].location[0]+1,seats[i].location[1]+1,seats[i].section);
       seats[i].available = 0;
     }
-    
+    if(await IsSoldOut(event.showID)) { await SetSoldOut(event.showID); }
     response = {
       statusCode: 200,
       body: seats
     };
   } catch (err) {
+    console.log(err);
     response = {
       statusCode: 400,
       error: err
