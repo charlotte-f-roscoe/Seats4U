@@ -516,30 +516,42 @@ useEffect(() => {
   }, [seatJSON]);
 
   useEffect(() => {
-    // Check if selectedSeats is an array
-    if (Array.isArray(selectedSeats) && selectedSeats.length > 0) {
-      const newTotalPrice = selectedSeats.reduce((acc, seatId) => {
-        // Extract the block section from the seatId (assuming seatId is in the format 'section-row-col')
-        const seatSection = seatId.split('-')[0];
-  
-        // Find the corresponding block in the blocks state
-        const block = blocks.body.find((block) => block.section === seatSection);
-  
-        // If a matching block is found, add its price to the total
-        if (block) {
-          return acc + block.price;
-        } else {
-          // Handle the case when the block is not found (you may want to use a default price)
-          return acc + 0; // Change 0 to the default price or handle it accordingly
-        }
-      }, 0);
-  
-      setTotalPrice(newTotalPrice);
+    if (Array.isArray(selectedSeats) && selectedSeats.length > 0 && blocks && blocks.body) {
+        const newTotalPrice = selectedSeats.reduce((acc, seatId) => {
+            const [seatSection, seatRow] = seatId.split('-');
+
+            console.log(`Processing seat ID: ${seatId}, Section: ${seatSection}, Row: ${seatRow}`);
+            const numericSeatRow = seatRow.charCodeAt(0) - 'A'.charCodeAt(0) + 1;
+
+            console.log("Numeric Row:", numericSeatRow);
+
+            const matchingBlock = blocks.body.find((block) => {
+                return (
+                    block.section === seatSection &&
+                    numericSeatRow >= block.rows[0] &&
+                    numericSeatRow <= block.rows[1]
+                );
+            });
+
+            console.log("Matching Block:", matchingBlock);
+
+            if (matchingBlock) {
+                console.log("Adding Price:", matchingBlock.price);
+                return acc + matchingBlock.price;
+            } else {
+                console.log("No Matching Block Found");
+                return acc + 0;
+            }
+        }, 0);
+
+        console.log("New Total Price:", newTotalPrice);
+        setTotalPrice(newTotalPrice);
     } else {
-      // Handle the case when selectedSeats is not an array or is empty
-      setTotalPrice(0);
+        console.log("Resetting Total Price to 0");
+        setTotalPrice(0);
     }
-  }, [selectedSeats, blocks]);
+}, [selectedSeats, blocks]);
+
   
 
   
