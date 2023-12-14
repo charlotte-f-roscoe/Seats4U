@@ -3,6 +3,8 @@ import React, { useState, useEffect, createContext, useContext } from "react";
 
 export default function SearchBar (props) {
 
+    
+
   const [search, setSearch] = useState('');
   const [result, setResult] = useState('');
   const [resultsDisplayed, setResultDisplayed] = useState(0);
@@ -26,16 +28,213 @@ export default function SearchBar (props) {
   const [defaultPrice, setDefaultPrice] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
 
+  const [alphabetArray, setAlphabetArray] = useState(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'])
+  const [colorArray, setColorArray] = useState(['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink'])
 
-  const [blocks, setBlocks] = useState(
-        { 
-            blocks: [ 
-                { price : 5.0, section: 'left', rows : [1, 3] },
-                { price : 10.0, section : 'center', rows : [1, 3] },
-                { price : 15.0, section : 'right', rows : [1, 3] }
-            ] 
+  const [listedBlocks, setListedBlocks] = useState([])
+
+
+  const [blocks, setBlocks] = useState([])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const payload = {
+                showID: showID
+              }
+            console.log(payload)
+            try {
+                const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/listBlocksForShow', 
+                {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                });
+            
+                const resultData = await response.json();
+                console.log(resultData)
+                setBlocks(resultData)
+        
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
         }
-    )
+        fetchData();
+    }, [showID])
+
+    useEffect(() => {
+            const handleView = async () => {
+
+                const payload = {
+                    'showID': showID,
+                  };
+            
+                  try {
+                        const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/getShowInfo', 
+                        {
+                        method: 'POST',
+                        body: JSON.stringify(payload),
+                        });
+                
+                        const resultData = await response.json();
+                        
+                        setVenueName(resultData.body.showInfo.venueName);
+                        setShowName(resultData.body.showInfo.showName);
+                        setShowDate(resultData.body.showInfo.showDate.substring(0,10));
+                        setStartTime(getNormalTime(resultData.body.showInfo.startTime));
+                        setEndTime(getNormalTime(resultData.body.showInfo.endTime));
+                        setDefaultPrice(resultData.body.showInfo.defaultPrice)
+        
+        
+            
+                        const seatsBySection = resultData.body.seats.reduce((result, seat) => {
+                            const [row, col] = seat.location;
+                            const sectionWithoutSpaces = seat.section.replace(/\s+/g, ''); // Remove spaces
+                            result[sectionWithoutSpaces] = result[sectionWithoutSpaces] || [];
+                            result[sectionWithoutSpaces][row - 1] = result[sectionWithoutSpaces][row - 1] || [];
+                            result[sectionWithoutSpaces][row - 1][col - 1] = seat.available;
+                            return result;
+                          }, {});
+            
+                          const ColorChangingButton = ({x, row, col, side}) => {
+                            const [buttonColor, setButtonColor] = useState('#e0e0e0');
+                            const [borderColor, setBorderColor] = useState('#ffffff');
+                            const [price, setPrice] = useState(0);
+                            useEffect(() => {
+                                if(blocks !== -1){
+                                    let color = '';
+                                    for (let i = 0; i < blocks.body.length; i++) {
+                                    if (side === blocks.body[i].section && row >= (blocks.body[i].rows[0]-1) && row <= (blocks.body[i].rows[1]-1)) {
+                                    color = colorArray[i];
+                                    setPrice(blocks.body[i].price)
+                                    break; // Exit the loop once the color is found
+                                    }
+                                }
+                                setButtonColor(color);
+        
+                                }
+                                }, [side, row]);
+                          
+                            const handleClick = () => {
+                              setBorderColor((prevColor) => (prevColor === '#ffffff' ? '#1cff51' : '#ffffff'));
+                              const seatId = side + '-' + alphabetArray[row] + (col + 1) + ' ';
+                              setSelectedSeats((oldArray) => {
+                                const index = oldArray.indexOf(seatId);
+                                
+                                if (index !== -1) {
+                                    const newArray = [...oldArray];
+                                    newArray.splice(index, 1);
+                                    setTotalPrice((oldPrice) => 
+                                    {
+                                        const newPrice = (oldPrice - price)
+                                        return newPrice
+                                    })
+                                    return newArray;
+                                } else {
+                                    setTotalPrice((oldPrice) => 
+                                    {
+                                        const newPrice = (oldPrice + price)
+                                        return newPrice
+                                    })
+                                    return [...oldArray, seatId];
+                                }
+                              });
+                              let jsonSeatID = {
+                                "location": [row, col],
+                                "section": side,
+                                "available": 0
+                              };
+                              
+                              setSeatsArray((oldArr) => {
+                                // Ensure oldArr is initialized as an array
+                                oldArr = Array.isArray(oldArr) ? oldArr : [];
+                              
+                                const seatIdentifier = `${row}-${col}-${side}`;
+                                const existingIndex = oldArr.findIndex(seat => {
+                                  const existingSeatIdentifier = `${seat.location[0]}-${seat.location[1]}-${seat.section}`;
+                                  return existingSeatIdentifier === seatIdentifier;
+                                });
+                              
+                                if (existingIndex !== -1) {
+                                  const newArr = [...oldArr];
+                                  newArr.splice(existingIndex, 1);
+                                  return newArr;
+                                } else {
+                                  return [...oldArr, jsonSeatID];
+                                }
+                              });
+            
+                            };
+                          
+                            return (
+                              <input
+                                type="button"
+                                value={x}
+                                style={{ 
+                                    backgroundColor: buttonColor,
+                                    borderRadius: '4px',
+                                    border: '2px solid '+ borderColor, 
+                                    padding: '6px', }}
+                                onClick={handleClick}
+                              />
+                            );
+                          };
+                        
+                        let Lblock = [];
+                        let Cblock = [];
+                        let Rblock = [];
+                        for (let i = 0; i < seatsBySection.left.length; i++){
+                            Lblock.push(<text>{alphabetArray[i]} </text>)
+                            for(let n=0; n< seatsBySection.left[i].length; n++){
+                                if(seatsBySection.left[i][n] === 1){
+                                    Lblock.push(<ColorChangingButton x={n+1} row={i} col={n} side='left'/>);
+                                } else {
+                                    Lblock.push(<input type="button" style={{ 
+                                        borderRadius: '4px',
+                                        border: '1px solid #757575', 
+                                        padding: '6px', }}
+                                        value={n+1}disabled/>);
+                                }
+                            }
+                            Lblock.push(<br/>);
+                        } setLBlock(Lblock)
+            
+                        for (let i = 0; i < seatsBySection.center.length; i++){
+                            Cblock.push(<text>{alphabetArray[i]} </text>)
+                            for(let n=0; n< seatsBySection.center[i].length; n++){
+                                if(seatsBySection.center[i][n] === 1){
+                                    Cblock.push(<ColorChangingButton x={n+1} row={i} col={n} side='center'/>);
+                                } else {
+                                    Cblock.push(<input type="button" style={{ 
+                                        borderRadius: '4px',
+                                        border: '1px solid #757575', 
+                                        padding: '6px', }} value={n+1} disabled/>);
+                                }
+                            }
+                            Cblock.push(<br/>);
+                        } setCBlock(Cblock)
+            
+                        for (let i = 0; i < seatsBySection.right.length; i++){
+                            Rblock.push(<text>{alphabetArray[i]} </text>)
+                            for(let n=0; n< seatsBySection.right[i].length; n++){
+                                if(seatsBySection.right[i][n] === 1){
+                                    Rblock.push(<ColorChangingButton x={n+1} row={i} col={n} side='right'/>);
+                                } else {
+                                    Rblock.push(<input type="button" style={{ 
+                                        borderRadius: '4px',
+                                        border: '1px solid #757575', 
+                                        padding: '6px', }} value={n+1} disabled/>);
+                                }
+                            }
+                            Rblock.push(<br/>);
+                        } setRBlock(Rblock)
+              
+            
+                    } catch (error) {
+                      console.error('Error fetching data:', error);
+                    }
+            
+        }
+        handleView();
+    }, [blocks])
 
   const purchaseSeats = async () =>{
     if (!selectedSeats || selectedSeats.length === 0) {
@@ -222,186 +421,38 @@ export default function SearchBar (props) {
     }
   }
 
+  const ListBlocks = () => {
+    if (blocks === -1) {
+        return ('')
+    } else {
+        return (
+            <div>
+                {listedBlocks.map((block, index) => (
+                    <div key={index}>{block}</div>
+                ))}
+            </div>
+        );
+    }
+}
+
+useEffect(() => {
+    let blockList = []
+    // Check if blocks is defined before accessing its properties
+    if (blocks && blocks.body) {
+        for (let i = 0; i < blocks.body.length; i++) {
+            blockList.push(<div><text style={{ color: colorArray[i] }}>■</text><text> = {blocks.body[i].price}</text></div>)
+        }
+        setListedBlocks(blockList)
+    }
+}, [blocks]);
+  
+
   function notauth(){  
     return (<div>
       <center><h1>You do not have authorization.</h1></center></div>);
     }
 
-    const handleView = async () => {
-        let alphabetArray = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-        let colorArray = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink']
-
-        const payload = {
-            'showID': showID,
-          };
     
-          try {
-                const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/getShowInfo', 
-                {
-                method: 'POST',
-                body: JSON.stringify(payload),
-                });
-        
-                const resultData = await response.json();
-                
-                setVenueName(resultData.body.showInfo.venueName);
-                setShowName(resultData.body.showInfo.showName);
-                setShowDate(resultData.body.showInfo.showDate.substring(0,10));
-                setStartTime(getNormalTime(resultData.body.showInfo.startTime));
-                setEndTime(getNormalTime(resultData.body.showInfo.endTime));
-                setDefaultPrice(resultData.body.showInfo.defaultPrice)
-
-    
-                const seatsBySection = resultData.body.seats.reduce((result, seat) => {
-                    const [row, col] = seat.location;
-                    const sectionWithoutSpaces = seat.section.replace(/\s+/g, ''); // Remove spaces
-                    result[sectionWithoutSpaces] = result[sectionWithoutSpaces] || [];
-                    result[sectionWithoutSpaces][row - 1] = result[sectionWithoutSpaces][row - 1] || [];
-                    result[sectionWithoutSpaces][row - 1][col - 1] = seat.available;
-                    return result;
-                  }, {});
-    
-                  const ColorChangingButton = ({x, row, col, side}) => {
-                    const [buttonColor, setButtonColor] = useState('#e0e0e0');
-                    const [borderColor, setBorderColor] = useState('#ffffff');
-                    const [price, setPrice] = useState(0);
-                    useEffect(() => {
-                        if(blocks !== -1){
-                            let color = '';
-                            for (let i = 0; i < blocks.blocks.length; i++) {
-                            if (side === blocks.blocks[i].section && row >= (blocks.blocks[i].rows[0]-1) && row <= (blocks.blocks[i].rows[1]-1)) {
-                            color = colorArray[i];
-                            setPrice(blocks.blocks[i].price)
-                            break; // Exit the loop once the color is found
-                            }
-                        }
-                        setButtonColor(color);
-
-                        }
-                        }, [side, row]);
-                  
-                    const handleClick = () => {
-                      setBorderColor((prevColor) => (prevColor === '#ffffff' ? '#1cff51' : '#ffffff'));
-                      const seatId = side + '-' + alphabetArray[row] + (col + 1) + ' ';
-                      setSelectedSeats((oldArray) => {
-                        const index = oldArray.indexOf(seatId);
-                        
-                        if (index !== -1) {
-                            const newArray = [...oldArray];
-                            newArray.splice(index, 1);
-                            console.log(price)
-                            setTotalPrice((oldPrice) => 
-                            {
-                                const newPrice = (oldPrice - price)
-                                return newPrice
-                            })
-                            return newArray;
-                        } else {
-                            console.log(price)
-                            setTotalPrice((oldPrice) => 
-                            {
-                                const newPrice = (oldPrice + price)
-                                return newPrice
-                            })
-                            return [...oldArray, seatId];
-                        }
-                      });
-                      let jsonSeatID = {
-                        "location": [row, col],
-                        "section": side,
-                        "available": 0
-                      };
-                      
-                      setSeatsArray((oldArr) => {
-                        // Ensure oldArr is initialized as an array
-                        oldArr = Array.isArray(oldArr) ? oldArr : [];
-                      
-                        const seatIdentifier = `${row}-${col}-${side}`;
-                        const existingIndex = oldArr.findIndex(seat => {
-                          const existingSeatIdentifier = `${seat.location[0]}-${seat.location[1]}-${seat.section}`;
-                          return existingSeatIdentifier === seatIdentifier;
-                        });
-                      
-                        if (existingIndex !== -1) {
-                          const newArr = [...oldArr];
-                          newArr.splice(existingIndex, 1);
-                          return newArr;
-                        } else {
-                          return [...oldArr, jsonSeatID];
-                        }
-                      });
-    
-                    };
-                  
-                    return (
-                      <input
-                        type="button"
-                        value={x}
-                        style={{ 
-                            backgroundColor: buttonColor,
-                            borderRadius: '4px',
-                            border: '2px solid '+ borderColor, 
-                            padding: '6px', }}
-                        onClick={handleClick}
-                      />
-                    );
-                  };
-                
-                let Lblock = [];
-                let Cblock = [];
-                let Rblock = [];
-                for (let i = 0; i < seatsBySection.left.length; i++){
-                    Lblock.push(<text>{alphabetArray[i]} </text>)
-                    for(let n=0; n< seatsBySection.left[i].length; n++){
-                        if(seatsBySection.left[i][n] === 1){
-                            Lblock.push(<ColorChangingButton x={n+1} row={i} col={n} side='left'/>);
-                        } else {
-                            Lblock.push(<input type="button" style={{ 
-                                borderRadius: '4px',
-                                border: '1px solid #757575', 
-                                padding: '6px', }}
-                                value={n+1}disabled/>);
-                        }
-                    }
-                    Lblock.push(<br/>);
-                } setLBlock(Lblock)
-    
-                for (let i = 0; i < seatsBySection.center.length; i++){
-                    Cblock.push(<text>{alphabetArray[i]} </text>)
-                    for(let n=0; n< seatsBySection.center[i].length; n++){
-                        if(seatsBySection.center[i][n] === 1){
-                            Cblock.push(<ColorChangingButton x={n+1} row={i} col={n} side='center'/>);
-                        } else {
-                            Cblock.push(<input type="button" style={{ 
-                                borderRadius: '4px',
-                                border: '1px solid #757575', 
-                                padding: '6px', }} value={n+1} disabled/>);
-                        }
-                    }
-                    Cblock.push(<br/>);
-                } setCBlock(Cblock)
-    
-                for (let i = 0; i < seatsBySection.right.length; i++){
-                    Rblock.push(<text>{alphabetArray[i]} </text>)
-                    for(let n=0; n< seatsBySection.right[i].length; n++){
-                        if(seatsBySection.right[i][n] === 1){
-                            Rblock.push(<ColorChangingButton x={n+1} row={i} col={n} side='right'/>);
-                        } else {
-                            Rblock.push(<input type="button" style={{ 
-                                borderRadius: '4px',
-                                border: '1px solid #757575', 
-                                padding: '6px', }} value={n+1} disabled/>);
-                        }
-                    }
-                    Rblock.push(<br/>);
-                } setRBlock(Rblock)
-      
-    
-            } catch (error) {
-              console.error('Error fetching data:', error);
-            }
-    
-      }
       function Search() {
         return (
         <div>
@@ -455,12 +506,6 @@ export default function SearchBar (props) {
 
 
   useEffect(() => {
-    if (showID !== '') {
-      handleView();
-    }
-  }, [showID]);
-
-  useEffect(() => {
     setSeatJson({
         showID: showID,
         seats: seatsArray
@@ -507,7 +552,8 @@ export default function SearchBar (props) {
           </text>
           <br /><br />
           <ShowDefaultPrice />
-          <br /><br />
+          <ListBlocks />
+          <br></br>
           <text>
             TOTAL PRICE: {totalPrice}
           </text>
