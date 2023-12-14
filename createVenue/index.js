@@ -1,7 +1,5 @@
 const mysql = require('mysql');
 const db_access = require('/opt/nodejs/db_access');
-const util = require('util');
-//const math = require('math.js');
 
 exports.handler = async (event) => {
   // get credentials from the db_access layer (loaded separately via AWS console)

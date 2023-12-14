@@ -32,6 +32,14 @@ exports.handler = async (event) => {
       let showInfo = await GetShowInfo(event.showID);
       let seatInfo = await GetSeats(event.showID);
       
+      for(let i=0;i<seatInfo.length;i++) {
+          seatInfo[i] = {
+              "location": [seatInfo[i].rowNum,seatInfo[i].colNum],
+              "section": seatInfo[i].seatSection,
+              "available": seatInfo[i].available
+          }
+      }
+      
       let result = {
         "showInfo": showInfo,
         "seats": seatInfo
