@@ -25,18 +25,19 @@ export default function SearchBar (props) {
   const [cBlock, setCBlock] = useState('');
   const [rBlock, setRBlock] = useState('');
 
+  const [defaultPrice, setDefaultPrice] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
 
-  const hardcodedSeatPrices = {
-    center: 50.0,
-    left: 50.0,
-    // Add more sections as needed
-  };
 
-  const getSeatPrice = (section) => {
-    // Check if the section exists in hardcodedSeatPrices
-    // If not, you can provide a default value or handle it accordingly
-    return hardcodedSeatPrices[section] || 0;
-  };
+  const [blocks, setBlocks] = useState(
+        { 
+            blocks: [ 
+                { price : 5.0, section: 'left', rows : [1, 3] },
+                { price : 10.0, section : 'center', rows : [1, 3] },
+                { price : 15.0, section : 'right', rows : [1, 3] }
+            ] 
+        }
+    )
 
   const purchaseSeats = async () =>{
     if (!selectedSeats || selectedSeats.length === 0) {
@@ -47,8 +48,6 @@ export default function SearchBar (props) {
        
         let payload = seatJSON;
 
-        console.log(payload)
-
         try {
         const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/purchaseSeats', {
             method: 'POST',
@@ -56,7 +55,6 @@ export default function SearchBar (props) {
         });
     
         const resultData = await response.json();
-        console.log(resultData)
 
         if (resultData.statusCode == '200') {
             alert("Your Seats have been purchased!");
@@ -74,10 +72,6 @@ export default function SearchBar (props) {
     }
 
 };
-
-
-
-
 
   function getNormalTime(showTime){
     let hours = parseInt(showTime/100);
@@ -105,7 +99,6 @@ export default function SearchBar (props) {
       method: 'POST',
       body: JSON.stringify(payload),
    });
-   console.log(payload)
 
    const resultData = await response.json();
 
@@ -116,7 +109,6 @@ export default function SearchBar (props) {
       else{
         alert("Unable to activate show. \t" + resultData.error)
       }
-      console.log(resultData)
       
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -136,7 +128,6 @@ export default function SearchBar (props) {
         method: 'POST',
         body: JSON.stringify(payload),
       });
-      console.log(payload)
 
       const resultData = await response.json();
 
@@ -147,7 +138,6 @@ export default function SearchBar (props) {
       else{
         alert("Unable to delete show. \t" + resultData.error)
       }
-      console.log(resultData)
       
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -177,7 +167,6 @@ export default function SearchBar (props) {
         for (const show of resultData.shows) {
           if(show.active){ // check if show is active then print out if true
           //  for (const show of showsForVenueManager ) {
-            //console.log(show);
             const showTime = getNormalTime(show.startTime);
            // printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\t" + (show.soldout ? "View Show": "Buy Tickets" )+ "\n";
            printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + show.venueName + "\t" + "View Show" + "\n";
@@ -188,8 +177,7 @@ export default function SearchBar (props) {
             
             printInfo += "Sold Out" + "\n";
             
-          } 
-            printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + show.venueName + "\t" + "View Show" + "\n";
+          }
             }
         }
        
@@ -198,7 +186,6 @@ export default function SearchBar (props) {
       }else if(props.user==1){
         let printInfo = [];
         for (const show of resultData.shows) {
-          
           console.log(show);
           const showTime = getNormalTime(show.startTime);
           if(show.venueName==props.venueName){
@@ -219,7 +206,6 @@ export default function SearchBar (props) {
         }else{
           let printInfo = [];
           for (const show of resultData.shows) {
-            console.log(show);
             const showTime = getNormalTime(show.startTime);
             let print_message = show.showName + "\t" + (show.showDate?.substring(0, 10) || 'N/A') + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\n";
           printInfo.push(
@@ -241,7 +227,13 @@ export default function SearchBar (props) {
     }
   };
 
-
+  const ShowDefaultPrice = () => {
+    if (defaultPrice === -1){
+        return ('')
+    } else {
+        return (<text> Base Price: {defaultPrice}</text>)    
+    }
+  }
 
   function notauth(){  
     return (<div>
@@ -250,7 +242,8 @@ export default function SearchBar (props) {
 
     const handleView = async () => {
         let alphabetArray = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-    
+        let colorArray = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink']
+
         const payload = {
             'showID': showID,
           };
@@ -269,6 +262,8 @@ export default function SearchBar (props) {
                 setShowDate(resultData.body.showInfo.showDate.substring(0,10));
                 setStartTime(getNormalTime(resultData.body.showInfo.startTime));
                 setEndTime(getNormalTime(resultData.body.showInfo.endTime));
+                setDefaultPrice(resultData.body.showInfo.defaultPrice)
+
     
                 const seatsBySection = resultData.body.seats.reduce((result, seat) => {
                     const [row, col] = seat.location;
@@ -285,19 +280,42 @@ export default function SearchBar (props) {
 
                   const ColorChangingButton = ({x, row, col, side}) => {
                     const [buttonColor, setButtonColor] = useState('#e0e0e0');
+                    const [borderColor, setBorderColor] = useState('#ffffff');
+                    const [price, setPrice] = useState(0);
+                    useEffect(() => {
+                        if(blocks !== -1){
+                            let color = '';
+                            for (let i = 0; i < blocks.blocks.length; i++) {
+                            if (side === blocks.blocks[i].section && row >= (blocks.blocks[i].rows[0]-1) && row <= (blocks.blocks[i].rows[1]-1)) {
+                            color = colorArray[i];
+                            setPrice(blocks.blocks[i].price)
+                            break; // Exit the loop once the color is found
+                            }
+                        }
+                        setButtonColor(color);
+
+                        }
+                        }, [side, row]);
                   
+
+                
                     const handleClick = () => {
-                      setButtonColor((prevColor) => (prevColor === '#e0e0e0' ? '#6ceb8e' : '#e0e0e0'));
+                      console.log(price);
+                      setBorderColor((prevColor) => (prevColor === '#ffffff' ? '#1cff51' : '#ffffff'));
                       const seatId = side + '-' + alphabetArray[row] + (col + 1) + ' ';
                       setSelectedSeats((oldArray) => {
                         const index = oldArray.indexOf(seatId);
-                        
+                    
                         if (index !== -1) {
                           const newArray = [...oldArray];
                           newArray.splice(index, 1);
+                          console.log('deselecting seat', price);
+                          setTotalPrice((oldPrice) => Math.max(oldPrice - price, 0)); // Ensure the price doesn't go below 0
+                          
                           return newArray;
                         } else {
-                          
+                          console.log('selecting seat', price);
+                          setTotalPrice((oldPrice) => oldPrice + price);
                           return [...oldArray, seatId];
                         }
                       });
@@ -306,17 +324,16 @@ export default function SearchBar (props) {
                         "section": side,
                         "available": 0
                       };
-                      
+                    
                       setSeatsArray((oldArr) => {
-                        // Ensure oldArr is initialized as an array
                         oldArr = Array.isArray(oldArr) ? oldArr : [];
-                      
+                    
                         const seatIdentifier = `${row}-${col}-${side}`;
                         const existingIndex = oldArr.findIndex(seat => {
                           const existingSeatIdentifier = `${seat.location[0]}-${seat.location[1]}-${seat.section}`;
                           return existingSeatIdentifier === seatIdentifier;
                         });
-                      
+                    
                         if (existingIndex !== -1) {
                           const newArr = [...oldArr];
                           newArr.splice(existingIndex, 1);
@@ -325,9 +342,9 @@ export default function SearchBar (props) {
                           return [...oldArr, jsonSeatID];
                         }
                       });
-    
                     };
                   
+              
 
                     return (
                       <input
@@ -337,7 +354,7 @@ export default function SearchBar (props) {
                         style={{ 
                             backgroundColor: buttonColor,
                             borderRadius: '4px',
-                            border: '1px solid #757575', 
+                            border: '2px solid '+ borderColor, 
                             padding: '6px', }}
                         onClick={handleClick}
                       />
@@ -470,6 +487,14 @@ export default function SearchBar (props) {
 
   }, [seatJSON]);
 
+  useEffect(() => {
+    // Calculate total price based on the number of selected seats
+    if(defaultPrice !== -1)
+    {
+        //const newTotalPrice = selectedSeats.length * defaultPrice;
+        //setTotalPrice(newTotalPrice);
+    }
+  }, [selectedSeats, defaultPrice]);
 
   
   function ViewShow(){
@@ -494,6 +519,13 @@ export default function SearchBar (props) {
           <br /><br />
           <text>
             Selected Seats: {selectedSeats}
+          </text>
+          <br /><br />
+         
+          <ShowDefaultPrice />
+          <br /><br />
+          <text>
+            TOTAL PRICE: {totalPrice}
           </text>
           <br /><br />
           
