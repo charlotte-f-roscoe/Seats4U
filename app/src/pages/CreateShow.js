@@ -14,6 +14,7 @@ export default function CreateShow(props){
     const [lBlock, setLBlock] = useState('');
     const [cBlock, setCBlock] = useState('');
     const [rBlock, setRBlock] = useState('');
+
     const[adminGiveVenueName, setAdminGiveVenueName] = useState(0)
 
     useEffect (() => {
@@ -35,7 +36,7 @@ export default function CreateShow(props){
                 console.log("End")
                 if(resultData.statusCode == "200"){
     
-                
+              
                 console.log(resultData.layout[0].leftRowNum)
                 console.log(resultData.layout[0].leftColNum)
                 console.log(resultData.layout[0].centerRowNum)
@@ -43,8 +44,11 @@ export default function CreateShow(props){
                 console.log(resultData.layout[0].rightRowNum)
                 console.log(resultData.layout[0].rightColNum)
                 
+               
+              
                 setVenueName(resultData.layout[0].venueName)
-    
+               
+                
                 let Lblock = [];
                 let Cblock = [];
                 let Rblock = [];
@@ -243,14 +247,17 @@ export default function CreateShow(props){
                         <div className="column" style={{ backgroundColor: "#fff" }}>
                             <h3>Side Left</h3>
                             {lBlock}
+                           
                         </div>
                         <div className="column" style={{ backgroundColor: "#fff" }}>
                             <h3>Center</h3>
                             {cBlock}
+                           
                         </div>
                         <div className="column" style={{ backgroundColor: "#fff" }}>
                             <h3>Side Right</h3>
                             {rBlock}
+                           
                         </div>
                     </div>
                     </center>

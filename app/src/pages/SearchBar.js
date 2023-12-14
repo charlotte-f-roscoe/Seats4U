@@ -26,8 +26,17 @@ export default function SearchBar (props) {
   const [rBlock, setRBlock] = useState('');
 
 
+  const hardcodedSeatPrices = {
+    center: 50.0,
+    left: 50.0,
+    // Add more sections as needed
+  };
 
-
+  const getSeatPrice = (section) => {
+    // Check if the section exists in hardcodedSeatPrices
+    // If not, you can provide a default value or handle it accordingly
+    return hardcodedSeatPrices[section] || 0;
+  };
 
   const purchaseSeats = async () =>{
     if (!selectedSeats || selectedSeats.length === 0) {
@@ -270,6 +279,10 @@ export default function SearchBar (props) {
                     return result;
                   }, {});
     
+
+               
+                  console.log(resultData)
+
                   const ColorChangingButton = ({x, row, col, side}) => {
                     const [buttonColor, setButtonColor] = useState('#e0e0e0');
                   
@@ -315,9 +328,11 @@ export default function SearchBar (props) {
     
                     };
                   
+
                     return (
                       <input
                         type="button"
+                        //value={`${x} - $${price}`} // Display the price here
                         value={x}
                         style={{ 
                             backgroundColor: buttonColor,
@@ -493,12 +508,22 @@ export default function SearchBar (props) {
             onClick={purchaseSeats}
             />
         </center>
-
-        
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <h3>Seat Prices</h3>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+            <div style={{ width: '20px', height: '20px', backgroundColor: 'red', marginRight: '5px' }}></div>
+            <text>$50.00</text>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+            <div style={{ width: '20px', height: '20px', backgroundColor: 'blue', marginRight: '5px' }}></div>
+            <text>$40.00</text>
+          </div>
+        </div>
         <br></br>
         <center>
         </center>
-        <center><h1>Stage</h1></center>
+        <center><h1>Stage</h1>  </center>
+        
         <center>
                 <style
                 dangerouslySetInnerHTML={{
