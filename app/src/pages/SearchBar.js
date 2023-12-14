@@ -171,7 +171,7 @@ export default function SearchBar (props) {
             //console.log(show);
             const showTime = getNormalTime(show.startTime);
            // printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\t" + (show.soldout ? "View Show": "Buy Tickets" )+ "\n";
-           printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\t" +  "View Show"+ "\n";
+           printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + show.venueName + "\t" + "View Show" + "\n";
           // Check if the show is sold 
           console.log(`soldout :${show.soldout}, show name: ${show.showName}`);
           
@@ -180,6 +180,7 @@ export default function SearchBar (props) {
             printInfo += "Sold Out" + "\n";
             
           } 
+            printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + show.venueName + "\t" + "View Show" + "\n";
             }
         }
        
@@ -406,7 +407,7 @@ export default function SearchBar (props) {
                         <th>ID</th>
                         <th>Name</th>
                         <th>Date/Time</th>
-                        <th>Status</th>
+                        <th>Venue Name</th>
                         <th>&#8203;</th>
                     </tr>
                     </thead>
