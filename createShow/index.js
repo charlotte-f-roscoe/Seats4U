@@ -169,7 +169,7 @@ exports.handler = async (event) => {
       let rowsInLayout = layout.leftRowNum + layout.centerRowNum + layout.rightRowNum;
       let rowsInBlocks = 0;
       for(let i=0;i<blocks.length;i++) {
-        rowsInBlocks += blocks[i].rows[0]*blocks[i].rows[1];
+        rowsInBlocks += blocks[i].rows[1]-blocks[i].rows[0]+1;
       }
       if(rowsInBlocks==rowsInLayout) {
         return resolve("number of seats in blocks and layout equal");
