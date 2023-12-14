@@ -15,6 +15,8 @@ export default function SearchBar (props) {
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
 
+  
+
   const [selectedSeats, setSelectedSeats] = useState('')
   const [seatsArray, setSeatsArray] = useState('')
   const [seatJSON, setSeatJson] = useState('')
@@ -23,13 +25,17 @@ export default function SearchBar (props) {
   const [cBlock, setCBlock] = useState('');
   const [rBlock, setRBlock] = useState('');
 
+
+
+
+
   const purchaseSeats = async () =>{
     if (!selectedSeats || selectedSeats.length === 0) {
 
         alert('You have no seats selected.')
 
     } else {
-
+       
         let payload = seatJSON;
 
         console.log(payload)
@@ -59,6 +65,10 @@ export default function SearchBar (props) {
     }
 
 };
+
+
+
+
 
   function getNormalTime(showTime){
     let hours = parseInt(showTime/100);
@@ -152,20 +162,33 @@ export default function SearchBar (props) {
       const resultData = await response.json();
 
       if(props.user==0){
+
         let printInfo = "";
+        console.log(resultData)
         for (const show of resultData.shows) {
           if(show.active){ // check if show is active then print out if true
           //  for (const show of showsForVenueManager ) {
             //console.log(show);
             const showTime = getNormalTime(show.startTime);
-            printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\t" + "View Show" + "\n";
+           // printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\t" + (show.soldout ? "View Show": "Buy Tickets" )+ "\n";
+           printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + (show.active ? 'Active' : 'Inactive') + "\t" +  "View Show"+ "\n";
+          // Check if the show is sold 
+          console.log(`soldout :${show.soldout}, show name: ${show.showName}`);
+          
+          if (show.soldout === 1) {
+            
+            printInfo += "Sold Out" + "\n";
+            
+          } 
             }
         }
+       
         setResult(printInfo);
       
       }else if(props.user==1){
         let printInfo = [];
         for (const show of resultData.shows) {
+          
           console.log(show);
           const showTime = getNormalTime(show.startTime);
           if(show.venueName==props.venueName){
@@ -260,6 +283,7 @@ export default function SearchBar (props) {
                           newArray.splice(index, 1);
                           return newArray;
                         } else {
+                          
                           return [...oldArray, seatId];
                         }
                       });
@@ -397,6 +421,7 @@ export default function SearchBar (props) {
                                 setShowDate(row.match(/\d{4}-\d{2}-\d{2}/)?.[0])
                                 setStartTime(row.match(/\d{1,2}:\d{2}\s[APMapm]{2}/)?.[0])
                                 }}>{cell}</button>) : (cell)}
+                           
                         </td>
                         ))}
                     </tr>
@@ -455,6 +480,7 @@ export default function SearchBar (props) {
             Selected Seats: {selectedSeats}
           </text>
           <br /><br />
+          
           <input
             type="button"
             value="Cancel and Exit"
