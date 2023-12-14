@@ -11,6 +11,21 @@ exports.handler = async (event) => {
       database: db_access.config.database
   });
   
+  let ValidShow = (showID) => {
+    return new Promise((resolve, reject) => {
+      pool.query("SELECT available FROM Shows WHERE showID=?",[showID], (error,rows) => {
+        if(error) { return reject(error); }
+        if(rows && rows.length == 1 && rows[0] == 1) {
+            resolve(rows);
+        } else if(rows[0] != 1) {
+          reject("Show is not active");
+        } else {
+          reject("Show does not exist");
+        }
+      });
+    });
+  };
+  
   let GetAvailableSeats = (showID) => {
     return new Promise((resolve, reject) => {
       pool.query("SELECT * FROM Seats WHERE showID=? AND available=?",[showID,1], (error,rows) => {
@@ -23,6 +38,7 @@ exports.handler = async (event) => {
   let response = undefined;
   
   try {
+    await ValidShow(event.showID);
     let availableSeats = await GetAvailableSeats(event.showID);
     
     response = {
