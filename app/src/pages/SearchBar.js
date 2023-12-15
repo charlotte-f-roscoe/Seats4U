@@ -536,14 +536,14 @@ useEffect(() => {
 
           console.log("Matching Block:", matchingBlock);
 
-          if (matchingBlock) {
-              console.log("Adding Price:", matchingBlock.price);
-              return acc + matchingBlock.price;
-          } else {
-              console.log("No Matching Block Found");
-              return acc + defaultPrice;
-          }
-      }, 0);
+            if (matchingBlock) {
+                console.log("Adding Price:", matchingBlock.price);
+                return acc + matchingBlock.price;
+            } else {
+                console.log("No Matching Block Found");
+                return acc + defaultPrice;
+            }
+        }, 0);
 
             console.log("New Total Price:", newTotalPrice);
             setTotalPrice(newTotalPrice);
@@ -552,6 +552,8 @@ useEffect(() => {
             setTotalPrice(0);
         }
       }, [selectedSeats, blocks]);
+
+  
 
   
   function ViewShow(){

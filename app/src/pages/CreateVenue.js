@@ -22,7 +22,7 @@ export default function CreateVenue(){
         if(side === 'L'){
             for (let i = 0; i < parseInt(LRows); i++){
                 for(let n=0; n< parseInt(LCols); n++){
-                    block.push("☐");
+                    block.push(<input type='button' value=' '/>);
                 }
                 block.push(<br/>);
             }
@@ -30,7 +30,7 @@ export default function CreateVenue(){
         } else if(side === 'C'){
             for (let i = 0; i < parseInt(CRows); i++){
                 for(let n=0; n< parseInt(CCols); n++){
-                    block.push("☐");
+                    block.push(<input type='button' value=' '/>);
                 }
                 block.push(<br/>);
             }
@@ -38,7 +38,7 @@ export default function CreateVenue(){
         } else if(side === 'R'){
             for (let i = 0; i < parseInt(RRows); i++){
                 for(let n=0; n< parseInt(RCols); n++){
-                    block.push("☐");
+                    block.push(<input type='button' value=' '/>);
                 }
                 block.push(<br/>);
             }
