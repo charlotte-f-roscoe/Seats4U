@@ -358,7 +358,7 @@ export default function CreateShow(props){
                     <label>
                       Pricing:
                       <br /><br />
-                      <DefaultPriceButton/>
+                      {DefaultPriceButton()}
                       <br></br>
                       <input type='button' value='Set Default Price' disabled={defaultPriceButtonCondition} onClick={() => {
                         setblocksButtonCondition(false)
@@ -368,7 +368,7 @@ export default function CreateShow(props){
                         setBoxes([])
                         setDefaultPriceButtonCondition(true)}} />
                       <br /><br />
-                      <BlocksButton/>
+                      {BlocksButton()}
                       <br></br>
                       <input type='button' value='Use Blocks' disabled={blocksButtonCondition} onClick={() => {
                         setDefaultPrice(-1)
@@ -479,7 +479,7 @@ export default function CreateShow(props){
           <br></br>
          
           <input type="button" value="ENTER VENUE" onClick={() => handleClick()} style={{ marginLeft: '0', padding: '5px' }} />
-          <CreateShowAdmin />
+          {CreateShowAdmin()}
       </center>
     </div>);
     }
