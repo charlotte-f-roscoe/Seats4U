@@ -78,16 +78,10 @@ exports.handler = async (event) => {
     }
     for(let i=0;i<shows.length;i++) {
       let seats = await GetSeats(shows[i].showID);
-      let seatsSoldRight = 0;
-      let seatsSoldCenter = 0;
-      let seatsSoldLeft = 0;
+      let seatsSold = [];
       for(let j=0;j<seats.length;j++) {
-        if(seats[j].seatSection == "right" && seats[j].available == 0) {
-          seatsSoldRight++;
-        } else if(seats[j].seatSection == "center" && seats[j].available == 0) {
-          seatsSoldCenter++;
-        } else if(seats[j].seatSection == "left" && seats[j].available == 0) {
-          seatsSoldLeft++;
+        if(seats[j].available == 0) {
+          seatsSold[seatsSold.length] = seats[j];
         }
       }
       let totalProceeds = 0;
@@ -95,18 +89,17 @@ exports.handler = async (event) => {
         //blocks
         let blocks = await GetBlocks(shows[i].showID);
         totalProceeds = 0;
-        for(let j=0;j<blocks.length;j++) {
-          if(blocks[j].section == "right") {
-            totalProceeds += (blocks[j].price*seatsSoldRight);
-          } else if(blocks[j].section == "left") {
-            totalProceeds += (blocks[j].price*seatsSoldLeft);
-          } else {
-            totalProceeds += (blocks[j].price*seatsSoldCenter);
+        for(let j=0;j<seatsSold.length;j++) {
+          for(let k=0;k<blocks.length;k++) {
+            if(blocks[k].blockSection === seatsSold[j].seatSection && blocks[k].startRow <= seatsSold[j].rowNum && seatsSold[j].rowNum <= blocks[k].endRow) {
+              totalProceeds += blocks[k].price;
+              break;
+            }
           }
         }
       } else {
         //defaultPrice
-        totalProceeds = (seatsSoldRight+seatsSoldCenter+seatsSoldLeft) * shows[i].defaultPrice;
+        totalProceeds = seatsSold.length * shows[i].defaultPrice;
       }
       shows[i] = {
         "showID": shows[i].showID,
@@ -118,8 +111,8 @@ exports.handler = async (event) => {
         "defaultPrice": shows[i].defaultPrice,
         "active": shows[i].active,
         "soldout": shows[i].soldout,
-        "seatsSold": (seatsSoldCenter+seatsSoldLeft+seatsSoldRight),
-        "seatsLeft": (seats.length-(seatsSoldCenter+seatsSoldLeft+seatsSoldRight)),
+        "seatsSold": seatsSold.length,
+        "seatsLeft": (seats.length-seatsSold.length),
         "totalProceeds":totalProceeds
       };
       

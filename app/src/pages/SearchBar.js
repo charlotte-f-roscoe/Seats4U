@@ -17,7 +17,7 @@ export default function SearchBar (props) {
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
 
-  const [selectedSeats, setSelectedSeats] = useState('')
+  const [selectedSeats, setSelectedSeats] = useState([])
   const [seatsArray, setSeatsArray] = useState('')
   const [seatJSON, setSeatJson] = useState('')
 
@@ -122,18 +122,8 @@ export default function SearchBar (props) {
                                 if (index !== -1) {
                                     const newArray = [...oldArray];
                                     newArray.splice(index, 1);
-                                    setTotalPrice((oldPrice) => 
-                                    {
-                                        const newPrice = (oldPrice - price)
-                                        return newPrice
-                                    })
                                     return newArray;
                                 } else {
-                                    setTotalPrice((oldPrice) => 
-                                    {
-                                        const newPrice = (oldPrice + price)
-                                        return newPrice
-                                    })
                                     return [...oldArray, seatId];
                                 }
                               });
@@ -361,20 +351,18 @@ export default function SearchBar (props) {
 
       if(props.user==0){
         let printInfo = "";
+        console.log(resultData)
         for (const show of resultData.shows) {
           if(show.active){ // check if show is active then print out if true
           //  for (const show of showsForVenueManager ) {
-            const showTime = getNormalTime(show.startTime);
-            printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + show.venueName + "\t" + "View Show" + "\n";
-            // Check if the show is sold 
             
-            if (show.soldout === 1) {
-              
-              printInfo += "Sold Out" + "\n";
-              
+            const showTime = getNormalTime(show.startTime);
+             // check if the show is sold 
+            const soldOutInfo = show.soldout === 1 ? "SOLD OUT" : ""; // Check if the show is sold out
+           printInfo += soldOutInfo + "\t" + show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + show.venueName + "\t" +  "View Show"+ "\n";
+        
             }
-              }
-          }
+        }
         setResult(printInfo);
       
       }else if(props.user==1){
@@ -461,6 +449,7 @@ useEffect(() => {
 
     
       function Search() {
+       
         return (
         <div>
             <center>
@@ -480,7 +469,8 @@ useEffect(() => {
                 <table style={{ width: '100%', textAlign: 'center' }}>
                     <thead>
                     <tr>
-                        <th>ID</th>
+                        <th></th>
+                        <th></th>
                         <th>Name</th>
                         <th>Date/Time</th>
                         <th>Venue Name</th>
@@ -497,7 +487,9 @@ useEffect(() => {
                                 setShowName(row.split(/\d+/)[1])
                                 setShowDate(row.match(/\d{4}-\d{2}-\d{2}/)?.[0])
                                 setStartTime(row.match(/\d{1,2}:\d{2}\s[APMapm]{2}/)?.[0])
-                                }}>{cell}</button>) : (cell)}
+                                }}>{cell}</button>) : (props.user === 0 && cellIndex === 1
+                                  ? null
+                                  : cell === 'SOLD OUT' ? (<text style={{ color: "red" }} >{cell}</text>) : cell)}
                         </td>
                         ))}
                     </tr>
@@ -525,14 +517,35 @@ useEffect(() => {
   }, [seatJSON]);
 
   useEffect(() => {
-    // Calculate total price based on the number of selected seats
-    if(defaultPrice !== -1)
-    {
-        //const newTotalPrice = selectedSeats.length * defaultPrice;
-        //setTotalPrice(newTotalPrice);
-    }
-  }, [selectedSeats, defaultPrice]);
+    // Check if selectedSeats is an array
+    if (Array.isArray(selectedSeats) && selectedSeats.length > 0) {
+      const newTotalPrice = selectedSeats.reduce((acc, seatId) => {
+        // Extract the block section from the seatId (assuming seatId is in the format 'section-row-col')
+        const seatSection = seatId.split('-')[0];
+  
+        // Find the corresponding block in the blocks state
+        const block = blocks.body.find((block) => block.section === seatSection);
+ 
+        if (block) {
+          return acc + block.price;
+        } else {
+          // Handle the case when the block is not found
+         return acc + 0; // Change 0 to the default price or handle it accordingly
+        
+        }
+        }, 0);
+      
+  
+          setTotalPrice(newTotalPrice);
+        } else {
+          // Handle the case when selectedSeats is not an array or is empty
+          setTotalPrice(0);
+        }
+      }, [selectedSeats, blocks]);
+      
 
+
+  
   
   function ViewShow(){
 
