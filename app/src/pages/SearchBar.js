@@ -540,7 +540,7 @@ useEffect(() => {
                 return acc + matchingBlock.price;
             } else {
                 console.log("No Matching Block Found");
-                return acc + 0;
+                return acc + defaultPrice;
             }
         }, 0);
 
