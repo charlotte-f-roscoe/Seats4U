@@ -355,15 +355,12 @@ export default function SearchBar (props) {
         for (const show of resultData.shows) {
           if(show.active){ // check if show is active then print out if true
           //  for (const show of showsForVenueManager ) {
-            //console.log(show);
+            
             const showTime = getNormalTime(show.startTime);
-           printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + show.venueName + "\t" +  "View Show"+ "\n";
-          // Check if the show is sold 
-          if (show.soldout === 1) {
-            
-            printInfo += "SOLD OUT" + "\n";
-            
-          } 
+             // check if the show is sold 
+            const soldOutInfo = show.soldout === 1 ? "SOLD OUT" : ""; // Check if the show is sold out
+           printInfo += soldOutInfo + "\t" + show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + show.venueName + "\t" +  "View Show"+ "\n";
+        
             }
         }
         setResult(printInfo);
@@ -452,6 +449,7 @@ useEffect(() => {
 
     
       function Search() {
+       
         return (
         <div>
             <center>
@@ -471,7 +469,8 @@ useEffect(() => {
                 <table style={{ width: '100%', textAlign: 'center' }}>
                     <thead>
                     <tr>
-                        <th>ID</th>
+                        <th></th>
+                        <th></th>
                         <th>Name</th>
                         <th>Date/Time</th>
                         <th>Venue Name</th>
@@ -488,7 +487,9 @@ useEffect(() => {
                                 setShowName(row.split(/\d+/)[1])
                                 setShowDate(row.match(/\d{4}-\d{2}-\d{2}/)?.[0])
                                 setStartTime(row.match(/\d{1,2}:\d{2}\s[APMapm]{2}/)?.[0])
-                                }}>{cell}</button>) : (cell)}
+                                }}>{cell}</button>) : (props.user === 0 && cellIndex === 1
+                                  ? null
+                                  : cell === 'SOLD OUT' ? (<text style={{ color: "red" }} >{cell}</text>) : cell)}
                         </td>
                         ))}
                     </tr>
