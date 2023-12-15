@@ -33,6 +33,10 @@ export default function SearchBar (props) {
 
   const [listedBlocks, setListedBlocks] = useState([])
 
+  const [sortBy, setSortBy] = useState('')
+
+  const [seatList, setSeatList] = useState('Sorting by Price')
+
 
   const [blocks, setBlocks] = useState([])
 
@@ -601,31 +605,57 @@ useEffect(() => {
 
         
         <br></br>
-        <center>
-        </center>
-        <center><h1>Stage</h1></center>
+
         <center>
                 <style
                 dangerouslySetInnerHTML={{
                 __html:
-                                '\n* {\n  box-sizing: border-box;\n}\n\n\n.column {\n  float: left;\n  width: 33.33%;\n  padding: 10px;\n /\n}\n\n\n.row:after {\n  content: "";\n  display: table;\n  clear: both;\n}\n'
+                                '\n* {\n  box-sizing: border-box;\n}\n\n\n.column {\n  float: left;\n  width: 50.0%;\n  padding: 10px;\n /\n}\n\n\n.row:after {\n  content: "";\n  display: table;\n  clear: both;\n}\n'
                             }}
                 />
                 <div className="row">
-                    <div className="column" style={{ backgroundColor: "#fff" }}>
-                        <h3>Side Left</h3>
-                        <h3>{lBlock}</h3>
-                    </div>
-                    <div className="column" style={{ backgroundColor: "#fff" }}>
-                        <h3>Side Center</h3>
-                        <h3>{cBlock}</h3>
-                    </div>
-                    <div className="column" style={{ backgroundColor: "#fff" }}>
-                        <h3>Side Right</h3>
-                        <h3>{rBlock}</h3>
-                    </div>
-                </div>
-                </center>
+                            <div className="column" style={{ backgroundColor: "#fff" }}>
+                                            
+                             </div>
+                            <div className="column" style={{ backgroundColor: "#fff" }}>
+                            <center><h1>Stage</h1></center>
+                                    <style
+                                dangerouslySetInnerHTML={{
+                                __html:
+                                                '\n* {\n  box-sizing: border-box;\n}\n\n\n.column {\n  float: left;\n  width: 33.33%;\n  padding: 10px;\n /\n}\n\n\n.row:after {\n  content: "";\n  display: table;\n  clear: both;\n}\n'
+                                            }}
+                                />
+                                <div className="row">
+                                    <div className="column" style={{ backgroundColor: "#fff" }}>
+                                        <h3>Side Left</h3>
+                                        <h3>{lBlock}</h3>
+                                    </div>
+                                    <div className="column" style={{ backgroundColor: "#fff" }}>
+                                        <h3>Side Center</h3>
+                                        <h3>{cBlock}</h3>
+                                    </div>
+                                    <div className="column" style={{ backgroundColor: "#fff" }}>
+                                        <h3>Side Right</h3>
+                                        <h3>{rBlock}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="column" style={{ backgroundColor: "#fff" }}>
+                                <h3>Seat List</h3>
+                                <text>Sort by: </text>
+                                <select id="sortBy" value={sortBy} onChange={(e) => {
+                                    setSortBy(e.target.value)
+                                    setSeatList(e.target.value)
+                                    }}>
+                                    <option value="Sorting by Price">Price &#40;Descending&#41;</option>
+                                    <option value="Sorting by Section">Section</option>
+                                    <option value="Sorting by Row">Row &#40;Ascending&#41;</option>
+                                </select>
+                                <br></br>
+                                <p>{seatList}</p>
+                            </div>
+                        </div>
+            </center>
         <br /><br />
       </div>
     )
