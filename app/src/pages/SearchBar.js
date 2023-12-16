@@ -3,7 +3,7 @@ import React, { useState, useEffect, createContext, useContext } from "react";
 
 export default function SearchBar (props) {
 
-    
+//THIS IS AN OLD VERION!!!!!
 
   const [search, setSearch] = useState('');
   const [result, setResult] = useState('');
