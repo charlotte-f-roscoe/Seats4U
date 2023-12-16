@@ -35,6 +35,14 @@ export default function SearchBar (props) {
 
   const [listedBlocks, setListedBlocks] = useState([])
 
+  const [sortBy, setSortBy] = useState('price')
+
+  const [seatList, setSeatList] = useState('')
+
+  const [exampleSeats, setExampleSeats] = useState('')
+  const [seatsLength, setSeatsLength] = useState(0)
+
+
   const [blocks, setBlocks] = useState([])
   const [blockTicketInfo, setBlockTicketInfo] = useState([])
 
@@ -407,15 +415,12 @@ export default function SearchBar (props) {
         for (const show of resultData.shows) {
           if(show.active){ // check if show is active then print out if true
           //  for (const show of showsForVenueManager ) {
-            //console.log(show);
+            
             const showTime = getNormalTime(show.startTime);
-           printInfo += show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + show.venueName + "\t" +  "View Show"+ "\n";
-          // Check if the show is sold 
-          if (show.soldout === 1) {
-            
-            printInfo += "SOLD OUT" + "\n";
-            
-          } 
+             // check if the show is sold 
+            const soldOutInfo = show.soldout === 1 ? "SOLD OUT" : ""; // Check if the show is sold out
+           printInfo += soldOutInfo + "\t" + show.showID + "\t" + show.showName + "\t" + show.showDate.substring(0,10) + " at " + showTime + "\t" + show.venueName + "\t" +  "View Show"+ "\n";
+        
             }
         }
         setResult(printInfo);
@@ -496,6 +501,52 @@ useEffect(() => {
         setListedBlocks(blockList)
     }
 }, [blocks]);
+
+useEffect(() => {
+    
+    const fetchData = async () => {
+        const payload = {
+            showID: showID,
+            sortBy: sortBy
+          }
+        console.log(payload)
+        try {
+            const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/getSeatList', 
+            {
+                method: 'POST',
+                body: JSON.stringify(payload),
+            });
+        
+            const resultData = await response.json();
+            
+            setExampleSeats(resultData)
+            setSeatsLength(resultData.body.length)
+
+    
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+    fetchData();
+    
+}, [sortBy, showID]);
+
+useEffect(() => {
+
+    console.log(exampleSeats)
+    console.log(seatsLength)
+    
+    let sortedSeats = [];
+
+    for(let i = 0; i < seatsLength; i++){
+        sortedSeats.push(<text>{exampleSeats.body[i].price} - {alphabetArray[(exampleSeats.body[i].location[0])-1]}{exampleSeats.body[i].location[1]} - {exampleSeats.body[i].section}</text>)
+        sortedSeats.push(<br></br>)
+    }
+
+    setSeatList(sortedSeats)
+    
+    
+}, [exampleSeats,showID]);
   
 
   function notauth(){  
@@ -505,6 +556,7 @@ useEffect(() => {
 
     
       function Search() {
+       
         return (
         <div>
             <center>
@@ -524,7 +576,8 @@ useEffect(() => {
                 <table style={{ width: '100%', textAlign: 'center' }}>
                     <thead>
                     <tr>
-                        <th>ID</th>
+                        <th></th>
+                        <th></th>
                         <th>Name</th>
                         <th>Date/Time</th>
                         <th>Venue Name</th>
@@ -541,7 +594,9 @@ useEffect(() => {
                                 setShowName(row.split(/\d+/)[1])
                                 setShowDate(row.match(/\d{4}-\d{2}-\d{2}/)?.[0])
                                 setStartTime(row.match(/\d{1,2}:\d{2}\s[APMapm]{2}/)?.[0])
-                                }}>{cell}</button>) : (cell)}
+                                }}>{cell}</button>) : (props.user === 0 && cellIndex === 1
+                                  ? null
+                                  : cell === 'SOLD OUT' ? (<text style={{ color: "red" }} >{cell}</text>) : cell)}
                         </td>
                         ))}
                     </tr>
@@ -750,31 +805,56 @@ useEffect(() => {
             />
         </center>
         <br></br>
-        <center>
-        </center>
-        <center><h1>Stage</h1></center>
+
         <center>
                 <style
                 dangerouslySetInnerHTML={{
                 __html:
-                                '\n* {\n  box-sizing: border-box;\n}\n\n\n.column {\n  float: left;\n  width: 33.33%;\n  padding: 10px;\n /\n}\n\n\n.row:after {\n  content: "";\n  display: table;\n  clear: both;\n}\n'
+                                '\n* {\n  box-sizing: border-box;\n}\n\n\n.column {\n  float: left;\n  width: 50.0%;\n  padding: 10px;\n /\n}\n\n\n.row:after {\n  content: "";\n  display: table;\n  clear: both;\n}\n'
                             }}
                 />
                 <div className="row">
-                    <div className="column" style={{ backgroundColor: "#fff" }}>
-                        <h3>Side Left</h3>
-                        <h3>{lBlock}</h3>
-                    </div>
-                    <div className="column" style={{ backgroundColor: "#fff" }}>
-                        <h3>Side Center</h3>
-                        <h3>{cBlock}</h3>
-                    </div>
-                    <div className="column" style={{ backgroundColor: "#fff" }}>
-                        <h3>Side Right</h3>
-                        <h3>{rBlock}</h3>
-                    </div>
-                </div>
-                </center>
+                            <div className="column" style={{ backgroundColor: "#fff" }}>
+                                            
+                             </div>
+                            <div className="column" style={{ backgroundColor: "#fff" }}>
+                            <center><h1>Stage</h1></center>
+                                    <style
+                                dangerouslySetInnerHTML={{
+                                __html:
+                                                '\n* {\n  box-sizing: border-box;\n}\n\n\n.column {\n  float: left;\n  width: 33.33%;\n  padding: 10px;\n /\n}\n\n\n.row:after {\n  content: "";\n  display: table;\n  clear: both;\n}\n'
+                                            }}
+                                />
+                                <div className="row">
+                                    <div className="column" style={{ backgroundColor: "#fff" }}>
+                                        <h3>Side Left</h3>
+                                        <h3>{lBlock}</h3>
+                                    </div>
+                                    <div className="column" style={{ backgroundColor: "#fff" }}>
+                                        <h3>Side Center</h3>
+                                        <h3>{cBlock}</h3>
+                                    </div>
+                                    <div className="column" style={{ backgroundColor: "#fff" }}>
+                                        <h3>Side Right</h3>
+                                        <h3>{rBlock}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="column" style={{ backgroundColor: "#fff" }}>
+                                <h3>Seat List</h3>
+                                <text>Sort by: </text>
+                                <select id="sortBy" value={sortBy} onChange={(e) => {
+                                    setSortBy(e.target.value)
+                                    }}>
+                                    <option value="price">Price &#40;Descending&#41;</option>
+                                    <option value="seatSection">Section</option>
+                                    <option value="rowNum">Row &#40;Ascending&#41;</option>
+                                </select>
+                                <br></br>
+                                <p>{seatList}</p>
+                            </div>
+                        </div>
+            </center>
         <br /><br />
       </div>
     )
