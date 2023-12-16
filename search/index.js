@@ -12,8 +12,18 @@ exports.handler = async (event) => {
   let SearchDB = (value) => {
     value = "\%"+value+"\%";
     return new Promise((resolve, reject) => {
-       pool.query("SELECT * FROM Shows WHERE showName LIKE ? OR venueName LIKE ? OR showDate LIKE ? order by venueName, showDate, startTime", [value,value,value], (error, rows) => {
+       pool.query("SELECT * FROM Shows WHERE showName LIKE ? OR venueName LIKE ? OR showDate LIKE ? order by venueName, showDate, startTime", [1,value,value,value], (error, rows) => {
         if (error) { return reject(error); }
+        return resolve(rows);
+      });
+    });
+  };
+  let updateActiveShows = () => {
+    return new Promise((resolve,reject) => {
+      let curr = new Date();
+      let timeStr = `${curr.getHours()}${curr.getMinutes()}`;
+      pool.query("UPDATE Shows SET active=? WHERE (active=?) AND ((showDate=? AND startTime<=?) OR showDate<?)",[0,1,curr,timeStr,curr],(error,rows) => {
+        if(error) { return reject(error); }
         return resolve(rows);
       });
     });
@@ -22,6 +32,7 @@ exports.handler = async (event) => {
   let response = undefined;
   
   try {
+    await updateActiveShows();
     let results = await SearchDB(event.search);
     
     response = {
