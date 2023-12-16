@@ -9,22 +9,6 @@ exports.handler = async (event) => {
     password: db_access.config.password,
     database: db_access.config.database
   });
-  let checkAdmin = (value) => {
-    return new Promise((resolve, reject) => {
-      pool.query("SELECT * FROM Administrators WHERE authentication=?", [value], (error, rows) => {
-        if (error) { return reject(error); }
-        return resolve(rows.length == 1);
-      });
-    });
-  };
-  let checkVenueManager = (authentication, venueName) => {
-    return new Promise((resolve, reject) => {
-      pool.query("SELECT * FROM Venues WHERE venueManager=? AND venueName=?", [authentication, venueName], (error, rows) => {
-        if (error) { return reject(error); }
-        return resolve(rows.length == 1);
-      });
-    });
-  };
   let IsValidShowID = (showID) => {
     return new Promise((resolve, reject) => {
       pool.query("SELECT venueName FROM Shows WHERE showID=?", [showID], (error, rows) => {
@@ -45,29 +29,21 @@ exports.handler = async (event) => {
   let response = undefined;
 
   try {
-    let venueName = await IsValidShowID(event.showID);
-    if (await checkAdmin(event.authentication) || await checkVenueManager(event.authentication, venueName)) {
-      let blocks = await GetBlocks(event.showID);
+    await IsValidShowID(event.showID);
+    let blocks = await GetBlocks(event.showID);
 
-      for (let i = 0; i < blocks.length; i++) {
-        blocks[i] = {
-          "price": blocks[i].price,
-          "section": blocks[i].blockSection,
-          "rows": [blocks[i].startRow, blocks[i].endRow]
-        };
-      }
-
-      response = {
-        statusCode: 200,
-        body: blocks
+    for (let i = 0; i < blocks.length; i++) {
+      blocks[i] = {
+        "price": blocks[i].price,
+        "section": blocks[i].blockSection,
+        "rows": [blocks[i].startRow, blocks[i].endRow]
       };
     }
-    else {
-      response = {
-        statusCode: 400,
-        error: "No authorization"
-      };
-    }
+
+    response = {
+      statusCode: 200,
+      body: blocks
+    };
   }
   catch (err) {
     response = {
