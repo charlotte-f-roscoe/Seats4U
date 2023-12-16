@@ -13,11 +13,11 @@ exports.handler = async (event) => {
   
   let ValidShow = (showID) => {
     return new Promise((resolve, reject) => {
-      pool.query("SELECT available FROM Shows WHERE showID=?",[showID], (error,rows) => {
+      pool.query("SELECT active FROM Shows WHERE showID=?",[showID], (error,rows) => {
         if(error) { return reject(error); }
-        if(rows && rows.length == 1 && rows[0] == 1) {
+        if(rows && rows.length == 1 && rows[0].active == 1) {
             resolve(rows);
-        } else if(rows[0] != 1) {
+        } else if(rows[0].active != 1) {
           reject("Show is not active");
         } else {
           reject("Show does not exist");

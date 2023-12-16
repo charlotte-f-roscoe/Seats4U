@@ -99,11 +99,9 @@ exports.handler = async (event) => {
     });
   };
   let isBlockOverlap = (blocks, i) => {
-    //console.log("i: "+i);
     return new Promise((resolve, reject) => {
       for (let j = i + 1; j < blocks.length; j++) {
         let overlap = blocks[i].section == blocks[j].section && ((blocks[j].rows[0] <= blocks[i].rows[0] && blocks[i].rows[0] <= blocks[j].rows[1]) || ((blocks[j].rows[0] <= blocks[i].rows[1] && blocks[i].rows[1] <= blocks[j].rows[1])));
-        //console.log(""+(blocks[i].section == blocks[j].section)+" && ("+(blocks[j].rows[0] <= blocks[i].rows[0])+" && "+(blocks[i].rows[0] <= blocks[j].rows[1])+") || ("+(blocks[j].rows[0] <= blocks[i].rows[1])+" && "+(blocks[i].rows[1] <= blocks[j].rows[1])+")");
         if (overlap) {
           return reject("blocks " + i + "," + j + " overlapping");
         }
@@ -137,12 +135,15 @@ exports.handler = async (event) => {
       });
     });
   };
-  let CheckActiveDate = (date, active) => {
+  let CheckActiveDate = (date, active, startTime) => {
     return new Promise((resolve, reject) => {
       if (active == 0) { return resolve("Not activating"); }
-      let curr = new Date();
-      date = new Date(Date.parse(date));
-      let isInFuture = date >= curr || (date.getYear() == curr.getYear() && date.getMonth() == curr.getMonth() && date.getDate() == curr.getDate());
+      const timeZone = "America/New_York";
+      let curr = new Date(new Date().toLocaleString('en-US', { timeZone }));
+      let timeStr = `${curr.getHours()}${curr.getMinutes()}`;
+      curr.setHours(0, 0, 0, 0);
+      let showDate = new Date(Date.parse(date));
+      let isInFuture = showDate > curr || (showDate.getYear() == curr.getYear() && showDate.getMonth() == curr.getMonth() && showDate.getDate() == curr.getDate() && startTime >= timeStr);
       if (isInFuture) {
         return resolve("show date is in future, can activate");
       }
@@ -153,13 +154,16 @@ exports.handler = async (event) => {
   };
   let CheckBlockDefaultPrice = (defaultPrice, blocks) => {
     return new Promise((resolve, reject) => {
-      if(defaultPrice == -1 && blocks.length == 0) {
+      if (defaultPrice == -1 && blocks.length == 0) {
         return reject("No defaultPrice or blocks set");
-      } else if (defaultPrice != -1 && blocks.length != 0) {
+      }
+      else if (defaultPrice != -1 && blocks.length != 0) {
         return reject("Cannot have a defaultPrice and blocks");
-      } else if(defaultPrice == -1) {
+      }
+      else if (defaultPrice == -1) {
         return resolve("using blocks");
-      } else {
+      }
+      else {
         return resolve("using defaultPrice");
       }
     });
@@ -168,14 +172,16 @@ exports.handler = async (event) => {
     return new Promise((resolve, reject) => {
       let rowsInLayout = layout.leftRowNum + layout.centerRowNum + layout.rightRowNum;
       let rowsInBlocks = 0;
-      for(let i=0;i<blocks.length;i++) {
-        rowsInBlocks += blocks[i].rows[1]-blocks[i].rows[0]+1;
+      for (let i = 0; i < blocks.length; i++) {
+        rowsInBlocks += blocks[i].rows[1] - blocks[i].rows[0] + 1;
       }
-      if(rowsInBlocks==rowsInLayout) {
+      if (rowsInBlocks == rowsInLayout) {
         return resolve("number of seats in blocks and layout equal");
-      } else if(rowsInBlocks < rowsInLayout) {
+      }
+      else if (rowsInBlocks < rowsInLayout) {
         return reject("Blocks do not cover all seats");
-      } else {
+      }
+      else {
         reject("Should never be here blockSeats>layoutSeats");
       }
     });
@@ -186,18 +192,18 @@ exports.handler = async (event) => {
   try {
     await CheckVenueExists(event.venueName);
     if (await checkAdmin(event.authentication) || await checkVenueManager(event.authentication, event.venueName)) {
-      await CheckActiveDate(event.show.showDate, event.show.active);
+      await CheckActiveDate(event.show.showDate, event.show.active, event.show.startTime);
       await CheckShowOverlap(event.venueName, event.show.showDate, event.show.startTime, event.show.endTime);
-      const usingBlocks = "using blocks" === await CheckBlockDefaultPrice(event.show.defaultPrice,event.show.blocks);
+      const usingBlocks = "using blocks" === await CheckBlockDefaultPrice(event.show.defaultPrice, event.show.blocks);
       const layout = await GetLayout(event.venueName);
       const blocks = event.show.blocks;
       //check blocks
-      if(usingBlocks) {
+      if (usingBlocks) {
         for (let i = 0; i < blocks.length; i++) {
           await isBlockValid(blocks[i], layout);
           await isBlockOverlap(blocks, i);
         }
-        await CheckBlocksCoverAll(layout,blocks);
+        await CheckBlocksCoverAll(layout, blocks);
       }
       await CreateShow(event.venueName, event.show.showName, event.show.showDate, event.show.startTime, event.show.endTime, event.show.defaultPrice, event.show.active, event.show.soldOut);
 

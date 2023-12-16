@@ -722,9 +722,6 @@ useEffect(() => {
 
   }, [seatsArray]);
 
-  useEffect(() => {
-
-  }, [seatJSON]);
 
   useEffect(() => {
     try{
