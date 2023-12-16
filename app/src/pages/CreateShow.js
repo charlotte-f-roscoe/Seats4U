@@ -58,7 +58,7 @@ export default function CreateShow(props){
 
     const [defaultPrice, setDefaultPrice] = useState('');
 
-    const [blocks, setBlocks] = useState('');
+    const [blocks, setBlocks] = useState([]);
     const [blockInputs, setBlockInputs] = useState([]);
     const [blocksButtonCondition, setblocksButtonCondition] = useState(false);
     const [defaultPriceButtonCondition, setDefaultPriceButtonCondition] = useState(true);
@@ -71,6 +71,8 @@ export default function CreateShow(props){
     const [cBlock, setCBlock] = useState('');
     const [rBlock, setRBlock] = useState('');
     const[adminGiveVenueName, setAdminGiveVenueName] = useState(0)
+
+   
 
     const [payloadBlockCheck, setPayloadBlockCheck] = useState('')
 
@@ -133,14 +135,15 @@ export default function CreateShow(props){
                 let Cblock = [];
                 let Rblock = [];
                     for (let i = 0; i < parseInt(resultData.layout[0].leftRowNum); i++){
+                      console.log(resultData)
                         for(let n=0; n< parseInt(resultData.layout[0].leftColNum); n++){
                             Lblock.push(<input type='button' value=' '/>);
                         }
                         Lblock.push(<br/>);
                     } setLBlock(Lblock)
     
-                    for (let i = 0; i <  parseInt(resultData.layout[0].rightRowNum); i++){
-                        for(let n=0; n< parseInt(resultData.layout[0].rightColNum); n++){
+                    for (let i = 0; i <  parseInt(resultData.layout[0].centerRowNum); i++){
+                        for(let n=0; n< parseInt(resultData.layout[0].centerColNum); n++){
                             Cblock.push(<input type='button' value=' '/>);
                         }
                         Cblock.push(<br/>);
@@ -427,6 +430,7 @@ export default function CreateShow(props){
       
           const resultData = await response.json();
           if(resultData.statusCode == "200"){
+          
 
           
           setVenueName(resultData.layout[0].venueName)
@@ -435,6 +439,7 @@ export default function CreateShow(props){
           let Cblock = [];
           let Rblock = [];
               for (let i = 0; i < parseInt(resultData.layout[0].leftRowNum); i++){
+                console.log(resultData)
                   for(let n=0; n< parseInt(resultData.layout[0].leftColNum); n++){
                       Lblock.push(<input type='button' value=' '/>);
                   }
@@ -442,6 +447,7 @@ export default function CreateShow(props){
               } setLBlock(Lblock)
 
               for (let i = 0; i <  parseInt(resultData.layout[0].rightRowNum); i++){
+                console.log(resultData)
                   for(let n=0; n< parseInt(resultData.layout[0].rightColNum); n++){
                       Cblock.push(<input type='button' value=' '/>);
                   }
