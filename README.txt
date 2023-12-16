@@ -1,5 +1,7 @@
 Final Iteration  - Cangjie
 
+Admin password: admin1234
+
 CreateVenue:
 User enters a unique name for the venue and the number of rows and columns in each seating section (left, center, right).
 A pop up provides a generated Venue Manager password (Don't lose it!).
