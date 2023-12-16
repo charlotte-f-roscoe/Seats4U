@@ -25,7 +25,7 @@ exports.handler = async (event) => {
   };
   let GetSeatsRow = (showID) => {
     return new Promise((resolve, reject) => {
-      pool.query("SELECT * FROM Seats WHERE showID=? order by rowNum", [showID], (error, rows) => {
+      pool.query("SELECT * FROM Seats WHERE showID=? AND available=? order by rowNum", [showID,1], (error, rows) => {
         if (error) { return reject(error); }
         return resolve(rows);
       });
@@ -33,7 +33,7 @@ exports.handler = async (event) => {
   };
   let GetSeatsSection = (showID, section) => {
     return new Promise((resolve, reject) => {
-      pool.query("SELECT * FROM Seats WHERE showID=? AND seatSection=?", [showID, section], (error, rows) => {
+      pool.query("SELECT * FROM Seats WHERE showID=? AND available=? AND seatSection=?", [showID, 1, section], (error, rows) => {
         if (error) { return reject(error); }
         return resolve(rows);
       });

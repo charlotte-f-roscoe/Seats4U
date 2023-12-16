@@ -58,10 +58,39 @@ exports.handler = async (event) => {
       });
     });
   };
+  let GetActiveShows = () => {
+    return new Promise((resolve, reject) => {
+      pool.query("SELECT * FROM Shows WHERE active=?", [1], (error, rows) => {
+        if (error) { return reject(error); }
+        return resolve(rows);
+      });
+    });
+  };
+  let updateActiveShows = (showID) => {
+    return new Promise((resolve, reject) => {
+      pool.query("UPDATE Shows SET active=? WHERE showID=?", [0, showID], (error, rows) => {
+        if (error) { return reject(error); }
+        return resolve(rows);
+      });
+    });
+  };
+  
   
   let response = undefined;
   
   try {
+    let activeShows = await GetActiveShows();
+    const timeZone = "America/New_York";
+    let curr = new Date(new Date().toLocaleString('en-US', { timeZone }));
+    let timeStr = `${curr.getHours()}${curr.getMinutes()}`;
+    curr.setHours(0, 0, 0, 0);
+    for(let i=0;i<activeShows.length;i++) {
+      let showDate = activeShows[i].showDate;
+      let isInFuture = showDate > curr || (showDate.getYear() == curr.getYear() && showDate.getMonth() == curr.getMonth() && showDate.getDate() == curr.getDate() && activeShows[i].startTime >= timeStr);
+      if(!isInFuture) {
+        await updateActiveShows(activeShows[i].showID);
+      }
+    }
     let shows = {};
     if(await checkAdmin(event.authentication) || await checkVenueManager(event.venueName,event.authentication)) {
       if(event.venueName == "") {
