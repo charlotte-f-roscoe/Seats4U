@@ -33,9 +33,12 @@ export default function SearchBar (props) {
 
   const [listedBlocks, setListedBlocks] = useState([])
 
-  const [sortBy, setSortBy] = useState('')
+  const [sortBy, setSortBy] = useState('price')
 
-  const [seatList, setSeatList] = useState('Sorting by Price')
+  const [seatList, setSeatList] = useState('')
+
+  const [exampleSeats, setExampleSeats] = useState('')
+  const [seatsLength, setSeatsLength] = useState(0)
 
 
   const [blocks, setBlocks] = useState([])
@@ -45,7 +48,6 @@ export default function SearchBar (props) {
             const payload = {
                 showID: showID
               }
-            console.log(payload)
             try {
                 const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/listBlocksForShow', 
                 {
@@ -54,7 +56,6 @@ export default function SearchBar (props) {
                 });
             
                 const resultData = await response.json();
-                console.log(resultData)
                 setBlocks(resultData)
         
             } catch (error) {
@@ -105,7 +106,7 @@ export default function SearchBar (props) {
                             useEffect(() => {
                                 if(blocks !== -1){
                                     let color = '';
-                                    for (let i = 0; i < blocks.body.length; i++) {
+                                    for (let i = 0; i < blocks.length; i++) {
                                     if (side === blocks.body[i].section && row >= (blocks.body[i].rows[0]-1) && row <= (blocks.body[i].rows[1]-1)) {
                                     color = colorArray[i];
                                     setPrice(blocks.body[i].price)
@@ -355,7 +356,6 @@ export default function SearchBar (props) {
 
       if(props.user==0){
         let printInfo = "";
-        console.log(resultData)
         for (const show of resultData.shows) {
           if(show.active){ // check if show is active then print out if true
           //  for (const show of showsForVenueManager ) {
@@ -438,12 +438,58 @@ useEffect(() => {
     let blockList = []
     // Check if blocks is defined before accessing its properties
     if (blocks && blocks.body) {
-        for (let i = 0; i < blocks.body.length; i++) {
+        for (let i = 0; i < blocks.length; i++) {
             blockList.push(<div><text style={{ color: colorArray[i] }}>■</text><text> = {blocks.body[i].price}</text></div>)
         }
         setListedBlocks(blockList)
     }
 }, [blocks]);
+
+useEffect(() => {
+    
+    const fetchData = async () => {
+        const payload = {
+            showID: showID,
+            sortBy: sortBy
+          }
+        console.log(payload)
+        try {
+            const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/getSeatList', 
+            {
+                method: 'POST',
+                body: JSON.stringify(payload),
+            });
+        
+            const resultData = await response.json();
+            
+            setExampleSeats(resultData)
+            setSeatsLength(resultData.body.length)
+
+    
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+    fetchData();
+    
+}, [sortBy, showID]);
+
+useEffect(() => {
+
+    console.log(exampleSeats)
+    console.log(seatsLength)
+    
+    let sortedSeats = [];
+
+    for(let i = 0; i < seatsLength; i++){
+        sortedSeats.push(<text>{exampleSeats.body[i].price} - {alphabetArray[(exampleSeats.body[i].location[0])-1]}{exampleSeats.body[i].location[1]} - {exampleSeats.body[i].section}</text>)
+        sortedSeats.push(<br></br>)
+    }
+
+    setSeatList(sortedSeats)
+    
+    
+}, [exampleSeats,showID]);
   
 
   function notauth(){  
@@ -517,18 +563,12 @@ useEffect(() => {
   }, [seatsArray]);
 
   useEffect(() => {
-
-  }, [seatJSON]);
-
-  useEffect(() => {
     if (Array.isArray(selectedSeats) && selectedSeats.length > 0 && blocks && blocks.body) {
         const newTotalPrice = selectedSeats.reduce((acc, seatId) => {
             const [seatSection, seatRow] = seatId.split('-');
 
-            console.log(`Processing seat ID: ${seatId}, Section: ${seatSection}, Row: ${seatRow}`);
             const numericSeatRow = seatRow.charCodeAt(0) - 'A'.charCodeAt(0) + 1;
 
-            console.log("Numeric Row:", numericSeatRow);
 
             const matchingBlock = blocks.body.find((block) => {
                 return (
@@ -538,27 +578,19 @@ useEffect(() => {
                 );
             });
 
-            console.log("Matching Block:", matchingBlock);
 
             if (matchingBlock) {
-                console.log("Adding Price:", matchingBlock.price);
                 return acc + matchingBlock.price;
             } else {
-                console.log("No Matching Block Found");
                 return acc + defaultPrice;
             }
         }, 0);
 
-        console.log("New Total Price:", newTotalPrice);
         setTotalPrice(newTotalPrice);
     } else {
-        console.log("Resetting Total Price to 0");
         setTotalPrice(0);
     }
 }, [selectedSeats, blocks]);
-
-  
-
   
   function ViewShow(){
 
@@ -645,11 +677,10 @@ useEffect(() => {
                                 <text>Sort by: </text>
                                 <select id="sortBy" value={sortBy} onChange={(e) => {
                                     setSortBy(e.target.value)
-                                    setSeatList(e.target.value)
                                     }}>
-                                    <option value="Sorting by Price">Price &#40;Descending&#41;</option>
-                                    <option value="Sorting by Section">Section</option>
-                                    <option value="Sorting by Row">Row &#40;Ascending&#41;</option>
+                                    <option value="price">Price &#40;Descending&#41;</option>
+                                    <option value="seatSection">Section</option>
+                                    <option value="rowNum">Row &#40;Ascending&#41;</option>
                                 </select>
                                 <br></br>
                                 <p>{seatList}</p>
