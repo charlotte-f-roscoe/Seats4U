@@ -9,6 +9,8 @@ export default function SearchBar (props) {
   const [result, setResult] = useState('');
   const [resultsDisplayed, setResultDisplayed] = useState(0);
 
+  const [viewBlocksBoolean, setViewBlocksBoolean] = useState(0);
+
   const [showID, setShowID] = useState('');
 
   const [venueName, setVenueName] = useState('');
@@ -33,15 +35,15 @@ export default function SearchBar (props) {
 
   const [listedBlocks, setListedBlocks] = useState([])
 
-
   const [blocks, setBlocks] = useState([])
+  const [blockTicketInfo, setBlockTicketInfo] = useState([])
 
     useEffect(() => {
         const fetchData = async () => {
             const payload = {
                 showID: showID
               }
-            console.log(payload)
+        
             try {
                 const response = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/listBlocksForShow', 
                 {
@@ -50,8 +52,7 @@ export default function SearchBar (props) {
                 });
             
                 const resultData = await response.json();
-                console.log(resultData)
-                setBlocks(resultData)
+                setBlocks(resultData.body)
         
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -101,10 +102,10 @@ export default function SearchBar (props) {
                             useEffect(() => {
                                 if(blocks !== -1){
                                     let color = '';
-                                    for (let i = 0; i < blocks.body.length; i++) {
-                                    if (side === blocks.body[i].section && row >= (blocks.body[i].rows[0]-1) && row <= (blocks.body[i].rows[1]-1)) {
+                                    for (let i = 0; i < blocks.length; i++) {
+                                    if (side === blocks[i].section && row >= (blocks[i].rows[0]-1) && row <= (blocks[i].rows[1]-1)) {
                                     color = colorArray[i];
-                                    setPrice(blocks.body[i].price)
+                                    setPrice(blocks[i].price)
                                     break; // Exit the loop once the color is found
                                     }
                                 }
@@ -114,6 +115,7 @@ export default function SearchBar (props) {
                                 }, [side, row]);
                           
                             const handleClick = () => {
+                           
                               setBorderColor((prevColor) => (prevColor === '#ffffff' ? '#1cff51' : '#ffffff'));
                               const seatId = side + '-' + alphabetArray[row] + (col + 1) + ' ';
                               setSelectedSeats((oldArray) => {
@@ -151,6 +153,7 @@ export default function SearchBar (props) {
                                   return [...oldArr, jsonSeatID];
                                 }
                               });
+                            
             
                             };
                           
@@ -171,6 +174,11 @@ export default function SearchBar (props) {
                         let Lblock = [];
                         let Cblock = [];
                         let Rblock = [];
+
+                        let lBlockNoClick = [];
+                        let CBlockNoClick = [];
+                        let RBlockNoClick = [];
+
                         for (let i = 0; i < seatsBySection.left.length; i++){
                             Lblock.push(<text>{alphabetArray[i]} </text>)
                             for(let n=0; n< seatsBySection.left[i].length; n++){
@@ -333,6 +341,50 @@ export default function SearchBar (props) {
     }
 
   }
+
+  const handleViewBlocks = async (currentShowID, showName, venueName) => {
+    const payloadBlock={
+      showID: currentShowID
+    }
+
+    const blockResponse = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/listBlocksForShow', {
+      method: 'POST',
+      body: JSON.stringify(payloadBlock),
+    });
+
+    let blockResultData = await blockResponse.json();
+
+    setBlocks(blockResultData.body)
+   
+
+    let blockTicketsCurrent = []
+  
+    for(let i = 0; i < blockResultData.body.length; i++){
+      let block = blockResultData.body[i]
+      const payloadBlockTicket = {
+        showID: currentShowID,
+        block: block
+      }
+      console.log(payloadBlockTicket)
+
+      const blockTicketResponse = await fetch('https://b39qqxiz79.execute-api.us-east-1.amazonaws.com/Initial/getTicketsSold', {
+        method: 'POST',
+        body: JSON.stringify(payloadBlockTicket),
+      });
+
+      let blockTicketResultData = await blockTicketResponse.json();
+
+      console.log(blockTicketResultData)
+
+      blockTicketsCurrent.push(blockTicketResultData.body)
+    }
+    setBlockTicketInfo(blockTicketsCurrent)
+
+    setVenueName(venueName)
+    setShowID(currentShowID)
+    setShowName(showName)
+    setViewBlocksBoolean(1);
+  }
   
 
   const handleClick = async () => {
@@ -351,7 +403,7 @@ export default function SearchBar (props) {
 
       if(props.user==0){
         let printInfo = "";
-        console.log(resultData)
+       
         for (const show of resultData.shows) {
           if(show.active){ // check if show is active then print out if true
           //  for (const show of showsForVenueManager ) {
@@ -377,6 +429,7 @@ export default function SearchBar (props) {
                 <span>{print_message}</span>
                 <input type="button" value="Delete Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>deleteShow(show.showID)}  />
               <input type="button" value="Activate Show" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>activateShow(show.showID)} disabled={show.active}/>
+              <input type="button" value="View Blocks" style={{ marginLeft: '0', padding: '5px' }} onClick={() =>handleViewBlocks(show.showID, show.showName, show.venueName)}  hidden={show.defaultPrice!=-1}/>
               </p>
             </div>)
           }
@@ -433,9 +486,9 @@ export default function SearchBar (props) {
 useEffect(() => {
     let blockList = []
     // Check if blocks is defined before accessing its properties
-    if (blocks && blocks.body) {
-        for (let i = 0; i < blocks.body.length; i++) {
-            blockList.push(<div><text style={{ color: colorArray[i] }}>■</text><text> = {blocks.body[i].price}</text></div>)
+    if (blocks) {
+        for (let i = 0; i < blocks.length; i++) {
+            blockList.push(<div><text style={{ color: colorArray[i] }}>■</text><text> = {blocks[i].price}</text></div>)
         }
         setListedBlocks(blockList)
     }
@@ -503,6 +556,109 @@ useEffect(() => {
         </div>)
   }
 
+  function ListBlockInfo(){ 
+    let printInfo = []
+    let count = 1
+    for (const block of blocks){
+      let ticketsSold = blockTicketInfo[count-1].ticketsSold
+      let ticketsRemaining = blockTicketInfo[count-1].ticketsRemaining
+      console.log(block)
+      let profits = ticketsSold * block.price
+      printInfo.push(
+      <div><h3>Block {count} <text style={{ color: colorArray[count-1] }}>■</text></h3>
+       <text>Price: ${block.price}</text> <div><text>Section: {block.section}</text></div>
+       <div> <text>Rows: {block.rows[0]}-{block.rows[1]}</text></div> 
+      <div> <text>TicketsSold: {ticketsSold}</text></div>
+      <div> <text>Tickets Remaining: {ticketsRemaining}</text></div>
+      <div> <text>Profits: ${profits}</text></div>
+      </div>)
+      
+      count +=1
+    }
+    
+    return printInfo;
+  }
+
+  function VMSearch(){
+    return (
+      <div>
+        <center>
+          <h1></h1>
+          <h1>Seats4U</h1>
+          &nbsp; 🔎 &nbsp;
+          <input
+          id="searchbar"
+          placeholder='Search Shows'
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          />
+          <input type="button" value="SEARCH" onClick={handleClick} />
+          
+          {result && (
+          <div style={{ maxWidth: '500px', margin: '0 auto', marginBottom: '5px', marginTop: '25px' }}>
+            <table style={{ width: '100%', textAlign: 'center' }}>
+              <thead>
+                <tr>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+            {result}
+          </div>
+          
+        )}
+          <br />
+        </center>
+      </div>
+    );
+  }
+
+  function ViewBlocks(){
+    return (
+      <div>
+      <center>
+        <h1> Blocks for {showName}</h1>
+        <text>
+          Venue Name: {venueName}</text> 
+        <br>
+        </br>
+        <input
+            type="button"
+            value="Cancel and Exit"
+            onClick={() => {window.location.reload()}}
+            />
+          <ListBlockInfo/>
+        <br></br>
+        </center>
+      <br></br>
+      <center><h1>Stage</h1></center>
+        <center>
+                <style
+                dangerouslySetInnerHTML={{
+                __html:
+                                '\n* {\n  box-sizing: border-box;\n}\n\n\n.column {\n  float: left;\n  width: 33.33%;\n  padding: 10px;\n /\n}\n\n\n.row:after {\n  content: "";\n  display: table;\n  clear: both;\n}\n'
+                            }}
+                />
+                <div className="row">
+                    <div className="column" style={{ backgroundColor: "#fff" }}>
+                        <h3>Side Left</h3>
+                        <h3>{lBlock}</h3>
+                    </div>
+                    <div className="column" style={{ backgroundColor: "#fff" }}>
+                        <h3>Side Center</h3>
+                        <h3>{cBlock}</h3>
+                    </div>
+                    <div className="column" style={{ backgroundColor: "#fff" }}>
+                        <h3>Side Right</h3>
+                        <h3>{rBlock}</h3>
+                    </div>
+                </div>
+                </center>
+        <br /><br />
+      </div>)
+  }
+
 
   useEffect(() => {
     setSeatJson({
@@ -517,6 +673,7 @@ useEffect(() => {
   }, [seatJSON]);
 
   useEffect(() => {
+    try{
     if (Array.isArray(selectedSeats) && selectedSeats.length > 0 && blocks && blocks.body) {
         const newTotalPrice = selectedSeats.reduce((acc, seatId) => {
             const [seatSection, seatRow] = seatId.split('-');
@@ -551,13 +708,16 @@ useEffect(() => {
         console.log("Resetting Total Price to 0");
         setTotalPrice(0);
     }
+  }
+  catch{
+    
+  }
 }, [selectedSeats, blocks]);
 
   
 
   
   function ViewShow(){
-
     return (
         <div>
         <center>
@@ -598,8 +758,6 @@ useEffect(() => {
             onClick={purchaseSeats}
             />
         </center>
-
-        
         <br></br>
         <center>
         </center>
@@ -639,38 +797,9 @@ useEffect(() => {
     </div>
     );
   }else if(props.user == 1){
-    return (
-      <div>
-        <center>
-          <h1></h1>
-          <h1>Seats4U</h1>
-          &nbsp; 🔎 &nbsp;
-          <input
-          id="searchbar"
-          placeholder='Search Shows'
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          />
-          <input type="button" value="SEARCH" onClick={handleClick} />
-          
-          {result && (
-          <div style={{ maxWidth: '500px', margin: '0 auto', marginBottom: '5px', marginTop: '25px' }}>
-            <table style={{ width: '100%', textAlign: 'center' }}>
-              <thead>
-                <tr>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-            {result}
-          </div>
-          
-        )}
-          <br />
-        </center>
-      </div>
-    );
+    return (<div>
+      {viewBlocksBoolean==0 ? VMSearch() : ViewBlocks()} 
+      </div>);
   }
   else if (props.user ==2){
     return (
