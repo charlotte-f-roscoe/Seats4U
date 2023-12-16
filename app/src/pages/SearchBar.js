@@ -722,38 +722,44 @@ useEffect(() => {
 
   }, [seatsArray]);
 
+  useEffect(() => {
+
+  }, [seatJSON]);
 
   useEffect(() => {
     try{
-    // Check if selectedSeats is an array
-    if (Array.isArray(selectedSeats) && selectedSeats.length > 0) {
-      const newTotalPrice = selectedSeats.reduce((acc, seatId) => {
-        // Extract the block section from the seatId (assuming seatId is in the format 'section-row-col')
-        const seatSection = seatId.split('-')[0];
-  
-        // Find the corresponding block in the blocks state
-        const block = blocks.body.find((block) => block.section === seatSection);
-  
-        // If a matching block is found, add its price to the total
-        if (block) {
-          return acc + block.price;
-        } else {
-          // Handle the case when the block is not found (you may want to use a default price)
-          return acc + 0; // Change 0 to the default price or handle it accordingly
-        }
-      }, 0);
-  
-      setTotalPrice(newTotalPrice);
+    if (Array.isArray(selectedSeats) && selectedSeats.length > 0 && blocks) {
+        const newTotalPrice = selectedSeats.reduce((acc, seatId) => {
+            const [seatSection, seatRow] = seatId.split('-');
+
+            const numericSeatRow = seatRow.charCodeAt(0) - 'A'.charCodeAt(0) + 1;
+
+
+            const matchingBlock = blocks.find((block) => {
+                return (
+                    block.section === seatSection &&
+                    numericSeatRow >= block.rows[0] &&
+                    numericSeatRow <= block.rows[1]
+                );
+            });
+
+
+            if (matchingBlock) {
+                return acc + matchingBlock.price;
+            } else {
+                return acc + defaultPrice;
+            }
+        }, 0);
+
+        setTotalPrice(newTotalPrice);
     } else {
-        console.log("Resetting Total Price to 0");
         setTotalPrice(0);
     }
   }
   catch{
 
   }
-},[selectedSeats, blocks]);
-
+}, [selectedSeats, blocks]);
   
 
   
