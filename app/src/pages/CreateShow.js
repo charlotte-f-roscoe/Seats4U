@@ -76,6 +76,8 @@ export default function CreateShow(props){
 
     const [payloadBlockCheck, setPayloadBlockCheck] = useState('')
 
+    const [blockButton, setBlockButton] = useState('')
+
     const handleAddBlock = async (boxData) => {
 
         setCheckBlocks([...boxes, boxData]);
@@ -182,38 +184,38 @@ export default function CreateShow(props){
         }
       };
     const removeBlock = async (index) => {
+        console.log('AAAAAAAAAA')
         console.log(boxes)
         console.log(index)
         setBoxes((prevBoxes) => {
             const newArray = [...prevBoxes];
             newArray.splice(index, 1);
+            console.log('Chicken Sandwhich')
+            console.log(newArray)
             return newArray;
           });
 
     }
-
-      const BlocksButton = () => {
-        if (blocksButtonCondition === true){
-            return (
-                <div>
-                    {boxes.map((box, index) => (
-                    <div key={index} style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '5px', width: '200px' }} className={`box-container ${box.section}`}>
-                        <p>Section: {box.section}</p>
-                        <p>Start Row: {box.rows[0]}</p>
-                        <p>End Row: {box.rows[1]}</p>
-                        <p>Price: {box.price}</p>
-                        <button onClick= {() =>{removeBlock(index)}}>Remove Block</button>
-                    </div>
-                    ))}
-                    <BoxInput onAddBlock={handleAddBlock}/>
+    useEffect(() => {
+        if(blocksButtonCondition === true && boxes) {
+            setBlockButton(<div>
+                {boxes.map((box, index) => (
+                <div key={index} style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '5px', width: '200px' }} className={`box-container ${box.section}`}>
+                    <p>Section: {box.section}</p>
+                    <p>Start Row: {box.rows[0]}</p>
+                    <p>End Row: {box.rows[1]}</p>
+                    <p>Price: {box.price}</p>
+                    <button onClick= {() =>{removeBlock(index)}}>Remove Block</button>
                 </div>
-              );  
-        } else {
-            return (
-                ''
-              )
+                ))}
+                <BoxInput onAddBlock={handleAddBlock}/>
+            </div>)
         }
-      };
+        if(defaultPriceButtonCondition === true){
+            setBlockButton(<div></div>)
+        }
+      }, [boxes, blocksButtonCondition]);
+
 
     const handleSave = async (event, status) => {
       let payloadSaveShow = {};
@@ -371,7 +373,7 @@ export default function CreateShow(props){
                         setBoxes([])
                         setDefaultPriceButtonCondition(true)}} />
                       <br /><br />
-                      {BlocksButton()}
+                      {blockButton}
                       <br></br>
                       <input type='button' value='Use Blocks' disabled={blocksButtonCondition} onClick={() => {
                         setDefaultPrice(-1)
